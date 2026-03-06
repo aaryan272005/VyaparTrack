@@ -1,0 +1,145 @@
+<?php
+
+/* SAFE SESSION START */
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+/* LOGIN CHECK */
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$user = $_SESSION['user'];
+
+/* ACTIVE PAGE */
+$current_page = basename($_SERVER['PHP_SELF']);
+
+/* FETCH USERS */
+$users = include('database/show-users.php');
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>View Users</title>
+
+    <link rel="stylesheet" href="css/dashboard.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+    <div id="DashboardMainContainer">
+
+        <!-- SIDEBAR -->
+        <?php include('partials/app-sidebar.php'); ?>
+
+        <!-- MAIN CONTENT -->
+        <div class="DashboardContent_container" id="DashboardContent_container">
+
+            <!-- TOP NAV -->
+            <?php include('partials/app-topNav.php'); ?>
+
+
+            <div class="dashboardContent">
+
+                <div class="dashboard_content_main">
+
+                    <h1 class="section_header">
+                        <i class="fa fa-list"></i> List of Users
+                    </h1>
+
+
+                    <div class="users">
+
+                        <p class="userCount"><?= count($users) ?> Users</p>
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Email</th>
+                                    <th>Created At</th>
+                                    <th>Updated At</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <?php foreach ($users as $index => $user) { ?>
+
+                                    <tr>
+
+                                        <td><?= $index + 1 ?></td>
+
+                                        <td class="fname"><?= $user['first_name'] ?></td>
+
+                                        <td class="lname"><?= $user['last_name'] ?></td>
+
+                                        <td class="email"><?= $user['email'] ?></td>
+
+                                        <td><?= date('M d,Y', strtotime($user['created_at'])) ?></td>
+
+                                        <td><?= date('M d,Y', strtotime($user['updated_at'])) ?></td>
+
+                                        <td class="actionCell">
+
+                                            <a href="#" class="action-btn editUser" data-userid="<?= $user['id'] ?>"
+                                                data-fname="<?= $user['first_name'] ?>"
+                                                data-lname="<?= $user['last_name'] ?>" data-email="<?= $user['email'] ?>">
+
+                                                <i class="fa fa-pencil"></i> Edit
+
+                                            </a>
+
+                                            <a href="#" class="action-btn deleteUser" data-userid="<?= $user['id'] ?>"
+                                                data-fname="<?= $user['first_name'] ?>"
+                                                data-lname="<?= $user['last_name'] ?>">
+
+                                                <i class="fa fa-trash"></i> Delete
+
+                                            </a>
+
+                                        </td>
+
+                                    </tr>
+
+                                <?php } ?>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="js/script.js"></script>
+
+</body>
+
+</html>

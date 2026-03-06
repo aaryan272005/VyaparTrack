@@ -1,0 +1,647 @@
+/* RESET */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* MAIN LAYOUT */
+
+#DashboardMainContainer {
+  display: flex;
+}
+
+/* SIDEBAR */
+
+.DashboardSidebar {
+  width: 260px;
+  min-height: 100vh;
+
+  background: linear-gradient(180deg, #1a1a2e, #16213e);
+
+  position: fixed;
+  left: 0;
+  top: 0;
+
+  transition: all 0.35s ease;
+
+  overflow: hidden;
+}
+
+/* COLLAPSED SIDEBAR */
+
+.DashboardSidebar.collapsed {
+  width: 90px;
+  padding-right: 10px;
+}
+
+/* LOGO */
+
+.dashboard_logo {
+  padding: 20px;
+
+  font-size: 24px;
+  font-weight: bold;
+
+  /* center logo when sidebar is open */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+
+  text-align: center;
+}
+
+.dashboard_logo .hindi {
+  color: #008cff;
+}
+
+.dashboard_logo .english {
+  color: white;
+}
+
+/* COLLAPSED LOGO STYLE */
+
+.DashboardSidebar.collapsed .dashboard_logo {
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.DashboardSidebar.collapsed .dashboard_logo .english {
+  font-size: 18px;
+}
+
+/* USER */
+
+.dashboardSidebar_User {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 20px;
+
+  color: white;
+}
+
+.dashboardSidebar_User img {
+  width: 40px;
+  height: 40px;
+
+  border-radius: 50%;
+  border: 2px solid #008cff;
+}
+
+/* HIDE USER NAME WHEN COLLAPSED */
+
+.DashboardSidebar.collapsed .dashboardSidebar_User span {
+  display: none;
+}
+
+/* MENU */
+
+.dashboard_menu_list {
+  list-style: none;
+}
+
+/* MENU LINK */
+
+.dashboard_menu_list li a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 15px 20px;
+
+  color: #b0b0b0;
+  text-decoration: none;
+
+  transition: all 0.3s ease;
+}
+
+/* ICON */
+
+.dashboard_menu_list li a i {
+  font-size: 18px;
+  width: 22px;
+  text-align: center;
+}
+
+/* MENU TEXT */
+
+.menuText {
+  transition: opacity 0.3s ease;
+}
+
+/* HOVER */
+
+.dashboard_menu_list li a:hover {
+  background: rgba(0, 140, 255, 0.15);
+  color: #008cff;
+
+  border-left: 4px solid #008cff;
+}
+
+/* COLLAPSED MENU TEXT */
+
+.DashboardSidebar.collapsed .menuText {
+  display: none;
+}
+
+/* CENTER ICONS */
+
+.DashboardSidebar.collapsed .dashboard_menu_list li a {
+  justify-content: center;
+}
+
+/* ARROW */
+
+.arrow {
+  margin-left: auto;
+  transition: transform 0.35s ease;
+}
+
+/* HIDE ARROW WHEN COLLAPSED */
+
+.DashboardSidebar.collapsed .arrow {
+  display: none;
+}
+
+/* ROTATE ARROW */
+
+.liMenu.open .arrow {
+  transform: rotate(180deg);
+}
+
+/* SUBMENU */
+
+.sub-menu {
+  list-style: none;
+
+  max-height: 0;
+  overflow: hidden;
+
+  background: #1e3a5f;
+
+  transition: max-height 0.35s ease;
+}
+
+/* OPEN SUBMENU */
+
+.liMenu.open .sub-menu {
+  max-height: 200px;
+}
+
+/* SUBMENU LINKS */
+
+.sub-menu li a {
+  padding: 12px 50px;
+
+  font-size: 14px;
+
+  color: #cfd6ff;
+}
+
+.sub-menu li a:hover {
+  background: #2b4f7c;
+  color: white;
+}
+
+/* CONTENT AREA */
+
+.DashboardContent_container {
+  margin-left: 260px;
+  width: calc(100% - 260px);
+
+  display: flex;
+  flex-direction: column;
+
+  transition: all 0.35s ease;
+}
+
+/* CONTENT EXPAND */
+
+.DashboardContent_container.expanded {
+  margin-left: 90px;
+  width: calc(100% - 90px);
+}
+
+/* TOP NAV */
+
+.dashboard_topNav {
+  height: 60px;
+
+  background: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 20px;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* TOGGLE BUTTON */
+
+#toggleBtn {
+  background: #1a1a2e;
+  color: white;
+
+  padding: 10px 14px;
+
+  border-radius: 6px;
+
+  text-decoration: none;
+
+  transition: 0.3s;
+}
+
+#toggleBtn:hover {
+  background: #008cff;
+}
+
+/* LOGOUT */
+
+.logoutBtn {
+  border: 2px solid red;
+
+  padding: 8px 18px;
+
+  border-radius: 10px;
+
+  text-decoration: none;
+
+  color: red;
+
+  font-weight: 600;
+
+  transition: 0.3s;
+}
+
+.logoutBtn:hover {
+  background: red;
+  color: white;
+}
+
+/* CONTENT */
+
+.dashboardContent {
+  padding: 30px;
+  background: #f4f6f9;
+
+  min-height: 100vh;
+}
+
+/* MAIN CARD */
+
+.dashboard_content_main {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+/* ACTIVE MENU */
+
+.dashboard_menu_list li.active > a {
+  background: rgba(0, 140, 255, 0.2);
+  color: #008cff;
+
+  border-left: 4px solid #008cff;
+}
+
+/* ACTIVE SUBMENU */
+
+.sub-menu a.active {
+  background: #2b4f7c;
+  color: white;
+}
+
+/* ================= USERS MODULE ================= */
+
+/* Layout row */
+.row {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+/* Columns */
+.column {
+  padding: 10px;
+}
+
+.column-5 {
+  flex: 1;
+  min-width: 350px;
+}
+
+.column-7 {
+  flex: 2;
+  min-width: 500px;
+}
+
+/* Section Header */
+.section_header {
+  font-size: 20px;
+  font-weight: 600;
+
+  color: #008cff;
+
+  padding: 10px 12px;
+
+  border-left: 4px solid #008cff;
+
+  background: #f5f7fa;
+
+  border-radius: 6px;
+
+  margin-bottom: 15px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ================= USER FORM ================= */
+
+#userAddFormContainer {
+  padding-top: 10px;
+}
+
+/* Form box */
+.userForm {
+  width: 100%;
+
+  background: #ffffff;
+
+  padding: 20px;
+
+  border-radius: 10px;
+
+  border: 1px solid #e6e6e6;
+
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Labels */
+.userForm label {
+  display: block;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  margin-bottom: 5px;
+
+  color: #444;
+
+  text-transform: uppercase;
+}
+
+/* Inputs */
+.userForm input {
+  width: 100%;
+
+  height: 38px;
+
+  padding: 0 10px;
+
+  margin-bottom: 15px;
+
+  border-radius: 6px;
+
+  border: 1px solid #dcdcdc;
+
+  outline: none;
+
+  transition: 0.2s;
+}
+
+.userForm input:focus {
+  border-color: #008cff;
+
+  box-shadow: 0 0 0 2px rgba(0, 140, 255, 0.15);
+}
+
+/* Button */
+.userFormBtn {
+  background: #008cff;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-left: auto;
+  margin-top: 10px;
+
+  transition: 0.25s;
+}
+
+.userForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.userFormBtn:hover {
+  background: #006fd1;
+
+  transform: translateY(-1px);
+}
+
+/* ================= USERS TABLE ================= */
+
+.users {
+  margin-top: 10px;
+
+  background: #ffffff;
+
+  padding: 20px;
+
+  border-radius: 10px;
+
+  border: 1px solid #e6e6e6;
+
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* User count */
+.userCount {
+  font-size: 18px;
+
+  font-weight: 600;
+
+  color: #008cff;
+
+  text-align: right;
+
+  margin-bottom: 10px;
+}
+
+/* Table */
+table {
+  width: 100%;
+
+  border-collapse: collapse;
+}
+
+/* Header */
+table th {
+  background: #f5f7fa;
+
+  padding: 10px;
+
+  font-size: 13px;
+
+  text-transform: uppercase;
+
+  border-bottom: 2px solid #e6e6e6;
+
+  text-align: center;
+}
+
+/* Cells */
+table td {
+  padding: 10px;
+
+  font-size: 14px;
+
+  border-bottom: 1px solid #eee;
+
+  text-align: center;
+}
+
+/* Row hover */
+table tbody tr:hover {
+  background: #f9fbff;
+}
+
+/* ================= ACTION BUTTONS ================= */
+
+.action-btn {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 6px 12px;
+
+  font-size: 13px;
+
+  border-radius: 6px;
+
+  text-decoration: none;
+
+  transition: 0.25s;
+}
+
+/* Edit */
+
+.editUser {
+  color: #008cff;
+
+  background: rgba(0, 140, 255, 0.08);
+
+  border: 1px solid rgba(0, 140, 255, 0.2);
+}
+
+.editUser:hover {
+  background: #008cff;
+
+  color: white;
+}
+
+/* Delete */
+
+.deleteUser {
+  color: #e53935;
+
+  background: rgba(229, 57, 53, 0.08);
+
+  border: 1px solid rgba(229, 57, 53, 0.2);
+
+  margin-top: 6px;
+}
+
+.deleteUser:hover {
+  background: #e53935;
+
+  color: white;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+  .row {
+    flex-direction: column;
+  }
+
+  .column-5,
+  .column-7 {
+    flex: 100%;
+  }
+}
+
+/* ACTION CELL (keeps buttons aligned) */
+.actionCell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+/* BASE BUTTON STYLE */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  height: 34px;
+  min-width: 80px;
+
+  padding: 0 12px;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  border-radius: 6px;
+  text-decoration: none;
+
+  transition: 0.25s;
+}
+
+/* EDIT BUTTON */
+.editUser {
+  color: #0d6efd;
+  background: #e9f2ff;
+  border: 1px solid #b6d4fe;
+}
+
+.editUser:hover {
+  background: #0d6efd;
+  color: white;
+}
+
+/* DELETE BUTTON */
+.deleteUser {
+  color: #dc3545;
+  background: #fdeaea;
+  border: 1px solid #f5c2c7;
+}
+
+.deleteUser:hover {
+  background: #dc3545;
+  color: white;
+}
