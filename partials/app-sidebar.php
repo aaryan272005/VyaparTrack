@@ -1,3 +1,6 @@
+<?php
+    $user = $_SESSION['user'];
+?>
 <div class="DashboardSidebar" id="DashboardSidebar">
 
     <div class="dashboard_logo">
@@ -59,15 +62,15 @@
             <ul class="sub-menu">
 
                 <li>
-                    <a href="products-view.php" class="<?= ($current_page == 'products-view.php') ? 'active' : '' ?>">
-                        <i class="fa fa-circle"></i>
+                    <a href="./product-view.php" class="<?= ($current_page == 'products-view.php') ? 'active' : '' ?>">
+                        <i class="fa-solid fa-circle"></i>
                         <span class="menuText">View Products</span>
                     </a>
                 </li>
 
                 <li>
-                    <a href="products-add.php" class="<?= ($current_page == 'products-add.php') ? 'active' : '' ?>">
-                        <i class="fa fa-circle"></i>
+                    <a href="./product-add.php" class="<?= ($current_page == 'products-add.php') ? 'active' : '' ?>">
+                        <i class="fa-solid fa-circle"></i>
                         <span class="menuText">Add Products</span>
                     </a>
                 </li>
@@ -94,14 +97,14 @@
 
                 <li>
                     <a href="supplier-view.php">
-                        <i class="fa fa-circle"></i>
+                        <i class="fa-solid fa-circle"></i>
                         <span class="menuText">View Supplier</span>
                     </a>
                 </li>
 
                 <li>
                     <a href="supplier-add.php">
-                        <i class="fa fa-circle"></i>
+                        <i class="fa-solid fa-circle"></i>
                         <span class="menuText">Add Supplier</span>
                     </a>
                 </li>
@@ -128,14 +131,14 @@
 
                 <li>
                     <a href="order-create.php">
-                        <i class="fa fa-circle"></i>
+                        <i class="fa-solid fa-circle"></i>
                         <span class="menuText">Create Order</span>
                     </a>
                 </li>
 
                 <li>
                     <a href="order-view.php">
-                        <i class="fa fa-circle"></i>
+                        <i class="fa-solid fa-circle"></i>
                         <span class="menuText">View Orders</span>
                     </a>
                 </li>
@@ -162,14 +165,14 @@
 
                 <li>
                     <a href="users-view.php">
-                        <i class="fa fa-circle"></i>
+                        <i class="fa-solid fa-circle"></i>
                         <span class="menuText">View Users</span>
                     </a>
                 </li>
 
                 <li>
                     <a href="users-add.php">
-                        <i class="fa fa-circle"></i>
+                        <i class="fa-solid fa-circle"></i>
                         <span class="menuText">Add Users</span>
                     </a>
                 </li>

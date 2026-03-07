@@ -11,14 +11,11 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
-$_SESSION['table'] = 'users';
-$user = $_SESSION['user'];
-
-/* ACTIVE PAGE */
-$current_page = basename($_SERVER['PHP_SELF']);
+$_SESSION['table'] = 'products';
 
 /* FETCH USERS */
-$users = include('database/show-users.php');
+$products = include('database/show.php');
+
 
 ?>
 
@@ -30,7 +27,7 @@ $users = include('database/show-users.php');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>View Users</title>
+    <title>View Products</title>
 
     <link rel="stylesheet" href="css/dashboard.css">
 
@@ -57,22 +54,23 @@ $users = include('database/show-users.php');
                 <div class="dashboard_content_main">
 
                     <h1 class="section_header">
-                        <i class="fa fa-list"></i> List of Users
+                        <i class="fa fa-list"></i> List of Products
                     </h1>
 
 
                     <div class="users">
 
-                        <p class="userCount"><?= count($users) ?> Users</p>
+                        <p class="userCount"><?= count($products) ?> Products</p>
 
                         <table>
 
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
-                                    <th>Email</th>
+                                    <th>Image</th>
+                                    <th>Product Name</th>
+                                    <th>Description</th>
+                                    <th>Created by</th>
                                     <th>Created At</th>
                                     <th>Updated At</th>
                                     <th>Action</th>
@@ -81,35 +79,35 @@ $users = include('database/show-users.php');
 
                             <tbody>
 
-                                <?php foreach ($users as $index => $user) { ?>
+                                <?php foreach ($products as $index => $product) { ?>
 
                                     <tr>
 
                                         <td><?= $index + 1 ?></td>
 
-                                        <td class="fname"><?= $user['first_name'] ?></td>
+                                        <td class="fname">
+                                            <img class="productImages"src="uploads\<?= $product['img'] ?>" alt="">
+                                        </td>
 
-                                        <td class="lname"><?= $user['last_name'] ?></td>
+                                        <td class="lname"><?= $product['product_name'] ?></td>
 
-                                        <td class="email"><?= $user['email'] ?></td>
+                                        <td class="email"><?= $product['description'] ?></td>
 
-                                        <td><?= date('M d,Y  @h:i:s A', strtotime($user['created_at'])) ?></td>
+                                        <td><?= $product['created_by'] ?></td>
 
-                                        <td><?= date('M d,Y  @h:i:s A', strtotime($user['updated_at'])) ?></td>
+                                        <td><?= date('M d,Y  @h:i:s A', strtotime($product['created_at'])) ?></td>
+
+                                        <td><?= date('M d,Y  @h:i:s A', strtotime($product['updated_at'])) ?></td>
 
                                         <td class="actionCell">
 
-                                            <a href="#" class="action-btn editUser" data-userid="<?= $user['id'] ?>"
-                                                data-fname="<?= $user['first_name'] ?>"
-                                                data-lname="<?= $user['last_name'] ?>" data-email="<?= $user['email'] ?>">
+                                            <a href="#" class="action-btn editUser" data-userid="<?= $product['id'] ?>">
 
                                                 <i class="fa fa-pencil"></i> Edit
 
                                             </a>
 
-                                            <a href="#" class="action-btn deleteUser" data-userid="<?= $user['id'] ?>"
-                                                data-fname="<?= $user['first_name'] ?>"
-                                                data-lname="<?= $user['last_name'] ?>">
+                                            <a href="#" class="action-btn deleteUser" data-userid="<?= $product['id'] ?>">
 
                                                 <i class="fa fa-trash"></i> Delete
 

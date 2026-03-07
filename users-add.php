@@ -1,17 +1,14 @@
 <?php
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
 
 if (!isset($_SESSION['user'])) {
     header('Location: login.php');
     exit();
 }
 
+$_SESSION['table'] = 'users';
 $user = $_SESSION['user'];
-$current_page = basename($_SERVER['PHP_SELF']);
-
+$_SESSION['redirect_to'] = 'users-add.php';
 ?>
 
 <!DOCTYPE html>
@@ -40,14 +37,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
             <?php include('partials/app-topNav.php'); ?>
 
-
             <div class="dashboardContent">
-
                 <div class="dashboard_content_main">
 
                     <h1 class="section_header">
                         <i class="fa fa-plus"></i> Create User
                     </h1>
+
+
 
                     <div id="userAddFormContainer">
 
@@ -70,7 +67,22 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             </button>
 
                         </form>
+                        <!-- RESPONSE MESSAGE -->
+                        <?php
+                        if (isset($_SESSION['response'])) {
+                            $response = $_SESSION['response'];
+                            ?>
 
+                            <div class="responseMessage">
+                                <p class="<?= $response['success'] ? 'successMessage' : 'errorMessage' ?>">
+                                    <?= $response['message'] ?>
+                                </p>
+                            </div>
+
+                            <?php
+                            unset($_SESSION['response']);
+                        }
+                        ?>
                     </div>
 
                 </div>

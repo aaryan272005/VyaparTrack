@@ -28,3 +28,29 @@ document.querySelectorAll(".has-submenu > a").forEach((menu) => {
     parent.classList.toggle("open");
   });
 });
+
+// after add msg
+document.addEventListener("DOMContentLoaded", function(){
+
+    const msg = document.querySelector(".responseMessage");
+
+    if(msg){
+        setTimeout(() => {
+            msg.classList.add("fadeOut");
+        }, 3000);
+    }
+
+});
+
+// Img upload 
+const fileInput = document.getElementById("img");
+const fileName = document.getElementById("fileName");
+
+if(fileInput){
+    fileInput.addEventListener("change", function(){
+        fileName.textContent = this.files[0].name;
+    });
+}
+
+// 
+

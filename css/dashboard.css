@@ -299,7 +299,9 @@
 
 .dashboard_content_main {
   background: #ffffff;
-  padding: 25px;
+  margin-top: 15px;
+  padding: 30px;
+  min-height: 60vh;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
@@ -317,6 +319,11 @@
 .sub-menu a.active {
   background: #2b4f7c;
   color: white;
+}
+
+.sub-menu i {
+  font-size: 10px !important;
+  opacity: 0.7 !important;
 }
 
 /* ================= USERS MODULE ================= */
@@ -359,7 +366,7 @@
 
   border-radius: 6px;
 
-  margin-bottom: 15px;
+  margin-bottom: 35px;
 
   display: flex;
   align-items: center;
@@ -644,4 +651,92 @@ table tbody tr:hover {
 .deleteUser:hover {
   background: #dc3545;
   color: white;
+}
+
+.productTextArea {
+  width: 100%;
+  min-height: 120px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  resize: vertical;
+  font-size: 14px;
+}
+
+.responseMessage {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  animation: slideFadeIn 0.4s ease;
+}
+
+.successMessage {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #66bb6a;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 20px;
+}
+
+.errorMessage {
+  background: #fdecea;
+  color: #c62828;
+  border: 1px solid #ef5350;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 20px;
+}
+
+@keyframes slideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fadeOut {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+
+/* product img upload */
+.imageUploadWrapper{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.uploadBtn{
+    background: #1e88e5;
+    color: white !important;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.uploadBtn:hover{
+    background: #1565c0;
+}
+
+#fileName{
+    font-size: 13px;
+    color: #555;
+}
+
+.productImages{
+  width: 100px;
+  height: 100px;
 }
