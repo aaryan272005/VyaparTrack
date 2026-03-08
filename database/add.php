@@ -1,16 +1,17 @@
 <?php
 
-// Start the session
-session_start();
+date_default_timezone_set('Asia/Kolkata');
 
-// Capture table mappings
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+include('connection.php');
 include('table_columns.php');
 
-// Capture table name
 $table_name = $_SESSION['table'];
 $columns = $table_columns_mapping[$table_name];
 
-// Loop through the columns
 $db_arr = [];
 $user = $_SESSION['user'];
 
@@ -47,16 +48,19 @@ foreach ($columns as $column) {
         $value = $image_name;
     } else {
         $value = isset($_POST[$column]) ? $_POST[$column] : '';
+        $value = isset($_POST[$column]) ? $_POST[$column] : '';
+
+        if ($column === 'suppliers') {
+            continue;
+        }
     }
 
     $db_arr[$column] = $value;
 }
 
-// Build SQL query
 $table_properties = implode(", ", array_keys($db_arr));
 $table_placeholders = ':' . implode(", :", array_keys($db_arr));
 
-// Adding the record
 try {
 
     $sql = "INSERT INTO 
@@ -64,10 +68,32 @@ try {
             VALUES
             ($table_placeholders)";
 
-    include('connection.php');
-
     $stmt = $conn->prepare($sql);
     $stmt->execute($db_arr);
+
+    /* GET PRODUCT ID */
+    $product_id = $conn->lastInsertId();
+
+
+    /* INSERT SUPPLIERS (MANY TO MANY) */
+
+    if (isset($_POST['suppliers'])) {
+
+        $suppliers = $_POST['suppliers'];
+
+        foreach ($suppliers as $supplier) {
+
+            $query = "INSERT INTO productsuppliers (product, supplier)
+                      VALUES (:product, :supplier)";
+
+            $stmt = $conn->prepare($query);
+
+            $stmt->execute([
+                ':product' => $product_id,
+                ':supplier' => $supplier
+            ]);
+        }
+    }
 
     $response = [
         'success' => true,
@@ -83,6 +109,8 @@ try {
 }
 
 $_SESSION['response'] = $response;
+
 header('Location: ../' . $_SESSION['redirect_to']);
 exit;
-?> 
+
+?>

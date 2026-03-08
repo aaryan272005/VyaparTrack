@@ -1,5 +1,6 @@
 <?php
 
+date_default_timezone_set('Asia/Kolkata');
 /* SAFE SESSION START */
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -70,7 +71,7 @@ $products = include('database/show.php');
                                     <th>Image</th>
                                     <th>Product Name</th>
                                     <th>Description</th>
-                                    <th>Created by</th>
+                                    <th>Created By</th>
                                     <th>Created At</th>
                                     <th>Updated At</th>
                                     <th>Action</th>
@@ -86,28 +87,52 @@ $products = include('database/show.php');
                                         <td><?= $index + 1 ?></td>
 
                                         <td class="fname">
-                                            <img class="productImages"src="uploads\<?= $product['img'] ?>" alt="">
+                                            <img class="productImages" src="uploads/<?= $product['img'] ?>" alt="">
                                         </td>
 
                                         <td class="lname"><?= $product['product_name'] ?></td>
 
                                         <td class="email"><?= $product['description'] ?></td>
 
-                                        <td><?= $product['created_by'] ?></td>
+
+                                        <!-- CREATED BY -->
+                                        <td>
+                                            <?php
+
+                                            $query = "SELECT first_name
+                                                        FROM users
+                                                        WHERE id = :user_id";
+
+                                            $stmt = $conn->prepare($query);
+                                            $stmt->execute(['user_id' => $product['created_by']]);
+
+                                            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                                            echo $user['first_name'];
+
+                                            ?>
+                                        </td>
+
 
                                         <td><?= date('M d,Y  @h:i:s A', strtotime($product['created_at'])) ?></td>
 
                                         <td><?= date('M d,Y  @h:i:s A', strtotime($product['updated_at'])) ?></td>
 
+
                                         <td class="actionCell">
 
-                                            <a href="#" class="action-btn editUser" data-userid="<?= $product['id'] ?>">
+                                            <a href="#" class="action-btn editProduct editBtn"
+                                                data-pid="<?= $product['id'] ?>" data-name="<?= $product['product_name'] ?>"
+                                                data-description="<?= $product['description'] ?>">
 
                                                 <i class="fa fa-pencil"></i> Edit
 
                                             </a>
 
-                                            <a href="#" class="action-btn deleteUser" data-userid="<?= $product['id'] ?>">
+
+                                            <a href="#" class="action-btn deleteProduct deleteBtn"
+                                                data-id="<?= $product['id'] ?>" data-table="products"
+                                                data-name="<?= $product['product_name'] ?>">
 
                                                 <i class="fa fa-trash"></i> Delete
 
@@ -120,7 +145,6 @@ $products = include('database/show.php');
                                 <?php } ?>
 
                             </tbody>
-
                         </table>
 
                     </div>

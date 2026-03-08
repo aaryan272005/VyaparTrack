@@ -56,6 +56,20 @@ $_SESSION['redirect_to'] = 'product-add.php';
                             <label>Description:</label>
                             <textarea class="productTextArea" placeholder="Enter Product Description..."
                                 name="description"></textarea>
+                                
+                            <label>Suppliers:</label>
+                            <select name="suppliers" id="supplierInput" multiple="">
+                                <option value="">Select Supplier</option>
+                                <?php 
+                                $_SESSION['table'] = 'supplier';
+                                $suppliers = include('database/show.php');
+
+                                foreach ($suppliers as $supplier) {
+                                    echo "<option value='". $supplier['id'] . "'> ". $supplier['supplier_name'] ."</option>";
+                                }
+                                ?>
+                                
+                            </select>
 
                             <!-- Upload Img -->
                             <div class="imageUploadWrapper">

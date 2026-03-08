@@ -21,7 +21,6 @@ $table_columns_mapping = [
     ],
 
     'supplier' => [
-        'id',
         'supplier_name',
         'supplier_location',
         'email',
@@ -30,8 +29,7 @@ $table_columns_mapping = [
         'updated_at'
     ],
 
-    'productsupplier' => [
-        'id',
+    'productsuppliers' => [
         'supplier',
         'product',
         'quantity_order',
@@ -44,7 +42,6 @@ $table_columns_mapping = [
     ],
 
     'stock' => [
-        'id',
         'product_name',
         'created_by',
         'quantity',

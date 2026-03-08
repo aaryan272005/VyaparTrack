@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('Asia/Kolkata');
+
 /* SAFE SESSION START */
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -12,13 +14,10 @@ if (!isset($_SESSION['user'])) {
 }
 
 $_SESSION['table'] = 'users';
-$user = $_SESSION['user'];
 
-/* ACTIVE PAGE */
-$current_page = basename($_SERVER['PHP_SELF']);
 
 /* FETCH USERS */
-$users = include('database/show-users.php');
+$users = include('database/show.php');
 
 ?>
 
@@ -99,7 +98,7 @@ $users = include('database/show-users.php');
 
                                         <td class="actionCell">
 
-                                            <a href="#" class="action-btn editUser" data-userid="<?= $user['id'] ?>"
+                                            <a href="#" class="action-btn editUser editBtn" data-userid="<?= $user['id'] ?>"
                                                 data-fname="<?= $user['first_name'] ?>"
                                                 data-lname="<?= $user['last_name'] ?>" data-email="<?= $user['email'] ?>">
 
@@ -107,7 +106,7 @@ $users = include('database/show-users.php');
 
                                             </a>
 
-                                            <a href="#" class="action-btn deleteUser" data-userid="<?= $user['id'] ?>"
+                                            <a href="#" class="action-btn deleteUser deleteBtn" data-userid="<?= $user['id'] ?>"
                                                 data-fname="<?= $user['first_name'] ?>"
                                                 data-lname="<?= $user['last_name'] ?>">
 
