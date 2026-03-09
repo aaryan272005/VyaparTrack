@@ -87,7 +87,7 @@ $products = include('database/show.php');
                                         <td><?= $index + 1 ?></td>
 
                                         <td class="fname">
-                                            <img class="productImages" src="uploads/<?= $product['img'] ?>" alt="">
+                                            <img src="uploads/products/<?= $product['img'] ?>" width="60">
                                         </td>
 
                                         <td class="lname"><?= $product['product_name'] ?></td>

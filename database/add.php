@@ -1,116 +1,91 @@
 <?php
 
-date_default_timezone_set('Asia/Kolkata');
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
 
 include('connection.php');
-include('table_columns.php');
+
 
 $table_name = $_SESSION['table'];
-$columns = $table_columns_mapping[$table_name];
 
-$db_arr = [];
+if($table_name == 'products'){
+
+$product_name = $_POST['product_name'];
+$description = $_POST['description'];
+$suppliers = $_POST['suppliers'];
 $user = $_SESSION['user'];
+$created_by = $user['id'];
 
-foreach ($columns as $column) {
+$image_name = '';
 
-    if (in_array($column, ['created_at', 'updated_at'])) {
-        $value = date('Y-m-d H:i:s');
-    } else if ($column == 'created_by') {
-        $value = $user['id'];
-    } else if ($column == 'password') {
-        $value = password_hash($_POST[$column], PASSWORD_DEFAULT);
-    }
+if(isset($_FILES['img']) && $_FILES['img']['error'] == 0){
 
-    // IMAGE UPLOAD
-    else if ($column == 'img') {
+$img = $_FILES['img'];
+$image_name = time().'_'.$img['name'];
 
-        $image_name = '';
+$upload_dir = "../uploads/products/";
 
-        if (isset($_FILES['img']) && $_FILES['img']['error'] == 0) {
-
-            $target_dir = "../uploads/";
-
-            if (!is_dir($target_dir)) {
-                mkdir($target_dir, 0755, true);
-            }
-
-            $image_name = time() . '_' . $_FILES['img']['name'];
-
-            $target_file = $target_dir . $image_name;
-
-            move_uploaded_file($_FILES['img']['tmp_name'], $target_file);
-        }
-
-        $value = $image_name;
-    } else {
-        $value = isset($_POST[$column]) ? $_POST[$column] : '';
-        $value = isset($_POST[$column]) ? $_POST[$column] : '';
-
-        if ($column === 'suppliers') {
-            continue;
-        }
-    }
-
-    $db_arr[$column] = $value;
+if(!is_dir($upload_dir)){
+mkdir($upload_dir,0777,true);
 }
 
-$table_properties = implode(", ", array_keys($db_arr));
-$table_placeholders = ':' . implode(", :", array_keys($db_arr));
+move_uploaded_file($img['tmp_name'],$upload_dir.$image_name);
 
-try {
-
-    $sql = "INSERT INTO 
-            $table_name ($table_properties)
-            VALUES
-            ($table_placeholders)";
-
-    $stmt = $conn->prepare($sql);
-    $stmt->execute($db_arr);
-
-    /* GET PRODUCT ID */
-    $product_id = $conn->lastInsertId();
-
-
-    /* INSERT SUPPLIERS (MANY TO MANY) */
-
-    if (isset($_POST['suppliers'])) {
-
-        $suppliers = $_POST['suppliers'];
-
-        foreach ($suppliers as $supplier) {
-
-            $query = "INSERT INTO productsuppliers (product, supplier)
-                      VALUES (:product, :supplier)";
-
-            $stmt = $conn->prepare($query);
-
-            $stmt->execute([
-                ':product' => $product_id,
-                ':supplier' => $supplier
-            ]);
-        }
-    }
-
-    $response = [
-        'success' => true,
-        'message' => 'Successfully Added to the System.'
-    ];
-
-} catch (PDOException $e) {
-
-    $response = [
-        'success' => false,
-        'message' => $e->getMessage()
-    ];
 }
 
-$_SESSION['response'] = $response;
+try{
 
-header('Location: ../' . $_SESSION['redirect_to']);
-exit;
+$conn->beginTransaction();
 
-?>
+$stmt = $conn->prepare("
+INSERT INTO products
+(product_name,description,img,created_by,created_at,updated_at)
+VALUES (?,?,?,?,NOW(),NOW())
+");
+
+$stmt->execute([
+$product_name,
+$description,
+$image_name,
+$created_by
+]);
+
+$product_id = $conn->lastInsertId();
+
+foreach($suppliers as $supplier){
+
+$stmt = $conn->prepare("
+INSERT INTO productsupplier
+(supplier,product)
+VALUES (?,?)
+");
+
+$stmt->execute([
+$supplier,
+$product_id
+]);
+
+}
+
+$conn->commit();
+
+$_SESSION['response']=[
+'success'=>true,
+'message'=>'Product created successfully'
+];
+
+}catch(PDOException $e){
+
+$conn->rollBack();
+
+$_SESSION['response']=[
+'success'=>false,
+'message'=>$e->getMessage()
+];
+
+}
+
+}
+
+header('location: ../product-add.php');
+exit();

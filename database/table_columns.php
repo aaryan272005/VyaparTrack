@@ -29,7 +29,7 @@ $table_columns_mapping = [
         'updated_at'
     ],
 
-    'productsuppliers' => [
+    'productsupplier' => [
         'supplier',
         'product',
         'quantity_order',

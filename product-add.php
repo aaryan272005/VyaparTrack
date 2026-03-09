@@ -56,19 +56,24 @@ $_SESSION['redirect_to'] = 'product-add.php';
                             <label>Description:</label>
                             <textarea class="productTextArea" placeholder="Enter Product Description..."
                                 name="description"></textarea>
-                                
+
                             <label>Suppliers:</label>
-                            <select name="suppliers" id="supplierInput" multiple="">
+                            <select name="suppliers[]" id="supplierInput" multiple="">
                                 <option value="">Select Supplier</option>
-                                <?php 
+
+                                <?php
+                                $temp = $_SESSION['table'];
+
                                 $_SESSION['table'] = 'supplier';
                                 $suppliers = include('database/show.php');
 
+                                $_SESSION['table'] = $temp;
+
                                 foreach ($suppliers as $supplier) {
-                                    echo "<option value='". $supplier['id'] . "'> ". $supplier['supplier_name'] ."</option>";
+                                    echo "<option value='" . $supplier['id'] . "'>" . $supplier['supplier_name'] . "</option>";
                                 }
                                 ?>
-                                
+
                             </select>
 
                             <!-- Upload Img -->
@@ -81,7 +86,7 @@ $_SESSION['redirect_to'] = 'product-add.php';
                             </div>
 
                             <!-- Btn -->
-                            <button class="userFormBtn">
+                            <button type="submit" class="userFormBtn">
                                 <i class="fa fa-plus"></i> Create Product
                             </button>
 
