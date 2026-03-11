@@ -8,7 +8,7 @@ if (!isset($_SESSION['user'])) {
 
 $_SESSION['table'] = 'products';
 $user = $_SESSION['user'];
-$_SESSION['redirect_to'] = 'product-add.php';
+$_SESSION['redirect_to'] = 'order-create.php';
 ?>
 
 <!DOCTYPE html>
@@ -41,28 +41,85 @@ $_SESSION['redirect_to'] = 'product-add.php';
                 <div class="dashboard_content_main">
 
                     <h1 class="section_header">
-                        <i class="fa fa-plus"></i> Create Product
+                        <i class="fa fa-plus"></i> Create Order
                     </h1>
 
-                    
-                    <!-- RESPONSE MESSAGE -->
-                    <?php
-                    if (isset($_SESSION['response'])) {
-                        $response = $_SESSION['response'];
-                        ?>
+                    <form action="database/create-order.php" method="POST">
 
-                        <div class="responseMessage">
-                            <p class="<?= $response['success'] ? 'successMessage' : 'errorMessage' ?>">
-                                <?= $response['message'] ?>
-                            </p>
+                        <div>
+
+                            <div class="align-right">
+                                <button type="button" class="orderProductBtn">Add Another Product</button>
+                            </div>
+
+                            <div id="orderProductList">
+
+                                <div class="orderProductRow" id="productRowTemplate">
+
+                                    <div class="align-right">
+                                        <button type="button" class="removeProductRowBtn">
+                                            <i class="fa fa-trash"></i> Remove
+                                        </button>
+                                    </div>
+
+                                    <div>
+                                        <label>PRODUCT NAME</label>
+
+                                        <select name="product_id[]" class="product_name">
+
+                                            <option value="">Select Product</option>
+
+                                            <?php
+                                            $temp = $_SESSION['table'];
+
+                                            $_SESSION['table'] = 'products';
+                                            $products = include('database/show.php');
+
+                                            $_SESSION['table'] = $temp;
+
+                                            foreach ($products as $product) {
+                                                echo "<option value='" . $product['id'] . "'>" . $product['product_name'] . "</option>";
+                                            }
+                                            ?>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="supplierRows">
+                                        <!-- Suppliers will load dynamically -->
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="align-right">
+                                <button type="submit" class="orderProductSubmitBtn">Submit</button>
+                            </div>
+
                         </div>
 
-                        <?php
-                        unset($_SESSION['response']);
-                    }
-                    ?>
+                    </form>
 
                 </div>
+
+
+                <?php
+                if (isset($_SESSION['response'])) {
+                    $response = $_SESSION['response'];
+                    ?>
+
+                    <div class="responseMessage">
+                        <p class="<?= $response['success'] ? 'successMessage' : 'errorMessage' ?>">
+                            <?= $response['message'] ?>
+                        </p>
+                    </div>
+
+                    <?php
+                    unset($_SESSION['response']);
+                }
+                ?>
 
             </div>
 

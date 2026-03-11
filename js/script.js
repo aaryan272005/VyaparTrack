@@ -1,14 +1,18 @@
-const toggleBtn = document.getElementById("toggleBtn");
-const DashboardSidebar = document.getElementById("DashboardSidebar");
-const DashboardRightContainer = document.getElementById(
-  "DashboardRightContainer",
-);
+function reOrderTable(tableSelector, countSelector, label) {
+  let rows = $(tableSelector + " tbody tr");
 
-toggleBtn.addEventListener("click", (event) => {
-  event.preventDefault();
-  DashboardSidebar.classList.toggle("collapsed");
-  DashboardRightContainer.classList.toggle("expanded");
-});
+  // reorder numbers
+  rows.each(function (index) {
+    $(this)
+      .find("td:first")
+      .text(index + 1);
+  });
+
+  // update count text
+  if (countSelector) {
+    $(countSelector).text(rows.length + " " + label);
+  }
+}
 
 let message = $(".responseMessage");
 
@@ -26,15 +30,6 @@ if (message.length) {
       message.remove();
     }, 500);
   }, 3000);
-}
-
-// After removing the user reordering the table
-function reOrderTable() {
-  $(".users tbody tr").each(function (index) {
-    $(this)
-      .find("td:first")
-      .text(index + 1);
-  });
 }
 
 $(document).on("click", ".deleteUser", function (e) {
@@ -67,7 +62,7 @@ $(document).on("click", ".deleteUser", function (e) {
           if (response.success) {
             button.closest("tr").fadeOut(300, function () {
               $(this).remove();
-              reOrderTable(); // 🔥 fixes numbering
+              reOrderTable(".users", ".userCount", "Users"); // 🔥 fixes numbering
             });
 
             let count = $(".users tbody tr").length - 1;
@@ -159,31 +154,6 @@ $(document).on("click", ".editUser", function (e) {
   });
 });
 
-// Sidebar submenu toggle functionality
-document.addEventListener("DOMContentLoaded", function () {
-  // Handle clicks on the menu link (including arrow)
-  const menuLinks = document.querySelectorAll(".has-submenu > a");
-
-  menuLinks.forEach((link) => {
-    link.addEventListener("click", function (e) {
-      e.preventDefault();
-
-      const parentLi = this.closest(".liMenu");
-      if (!parentLi) return;
-
-      // Close other open menus
-      document.querySelectorAll(".liMenu.open").forEach((item) => {
-        if (item !== parentLi) {
-          item.classList.remove("open");
-        }
-      });
-
-      // Toggle current menu
-      parentLi.classList.toggle("open");
-    });
-  });
-});
-
 $(document).on("click", ".deleteProduct", function (e) {
   e.preventDefault();
 
@@ -212,7 +182,7 @@ $(document).on("click", ".deleteProduct", function (e) {
           if (response.success) {
             button.closest("tr").fadeOut(300, function () {
               $(this).remove();
-              reOrderTable(); // reorder numbering
+              reOrderTable(".products", ".productCount", "Products"); // reorder numbering
             });
 
             let count = $(".users tbody tr").length;
@@ -409,6 +379,9 @@ $(document).on("click", ".deleteSupplier", function (e) {
           if (response.success) {
             button.closest("tr").fadeOut(300, function () {
               $(this).remove();
+
+              // reorder table numbers + update count
+              reOrderTable(".suppliers", ".supplierCount", "Suppliers");
             });
 
             Swal.fire({

@@ -63,7 +63,7 @@ $products = include('database/show.php');
 
                         <p class="userCount"><?= count($products) ?> Products</p>
 
-                        <table>
+                        <table class="products">
 
                             <thead>
                                 <tr>
@@ -71,6 +71,7 @@ $products = include('database/show.php');
                                     <th>Image</th>
                                     <th>Product Name</th>
                                     <th>Description</th>
+                                    <th>Supplier</th>
                                     <th>Created By</th>
                                     <th>Created At</th>
                                     <th>Updated At</th>
@@ -93,6 +94,27 @@ $products = include('database/show.php');
                                         <td class="lname"><?= $product['product_name'] ?></td>
 
                                         <td class="email"><?= $product['description'] ?></td>
+
+                                        <td>
+                                            <?php
+
+                                            $query = "SELECT supplier.supplier_name FROM productsupplier JOIN supplier ON supplier.id = productsupplier.supplier WHERE productsupplier.product = :product_id";
+
+                                            $stmt = $conn->prepare($query);
+                                            $stmt->execute(['product_id' => $product['id']]);
+
+                                            $suppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                            if ($suppliers) {
+                                                foreach ($suppliers as $supplier) {
+                                                    echo $supplier['supplier_name'] . "<br>";
+                                                }
+                                            } else {
+                                                echo "No Supplier";
+                                            }
+
+                                            ?>
+                                        </td>
 
 
                                         <!-- CREATED BY -->
@@ -160,7 +182,7 @@ $products = include('database/show.php');
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <script src="js/dashboard.js"></script>
     <script src="js/script.js"></script>
 
 </body>

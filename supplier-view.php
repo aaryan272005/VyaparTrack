@@ -67,6 +67,7 @@ $suppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div id="DashboardMainContainer">
 
+        <!-- SIDEBAR -->
         <?php include('partials/app-sidebar.php'); ?>
 
         <div class="DashboardContent_container">
@@ -85,7 +86,7 @@ $suppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                         <p class="userCount"><?= count($suppliers) ?> Suppliers</p>
 
-                        <table>
+                        <table class="suppliers">
 
                             <thead>
                                 <tr>
@@ -199,6 +200,7 @@ $suppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script src="js/dashboard.js"></script>
     <script src="js/script.js"></script>
 
 </body>

@@ -1,91 +1,118 @@
 <?php
 
-
 session_start();
 
 include('connection.php');
 
-
 $table_name = $_SESSION['table'];
 
-if($table_name == 'products'){
+if ($table_name == 'products') {
 
-$product_name = $_POST['product_name'];
-$description = $_POST['description'];
-$suppliers = $_POST['suppliers'];
-$user = $_SESSION['user'];
-$created_by = $user['id'];
+    $product_name = $_POST['product_name'];
+    $description = $_POST['description'];
+    $suppliers = $_POST['suppliers'];
+    $user = $_SESSION['user'];
+    $created_by = $user['id'];
 
-$image_name = '';
+    $image_name = '';
 
-if(isset($_FILES['img']) && $_FILES['img']['error'] == 0){
+    if (isset($_FILES['img']) && $_FILES['img']['error'] == 0) {
 
-$img = $_FILES['img'];
-$image_name = time().'_'.$img['name'];
+        $img = $_FILES['img'];
+        $image_name = time() . '_' . $img['name'];
 
-$upload_dir = "../uploads/products/";
+        $upload_dir = "../uploads/products/";
 
-if(!is_dir($upload_dir)){
-mkdir($upload_dir,0777,true);
-}
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
 
-move_uploaded_file($img['tmp_name'],$upload_dir.$image_name);
+        move_uploaded_file($img['tmp_name'], $upload_dir . $image_name);
 
-}
+    }
 
-try{
+    try {
 
-$conn->beginTransaction();
+        $conn->beginTransaction();
 
-$stmt = $conn->prepare("
-INSERT INTO products
-(product_name,description,img,created_by,created_at,updated_at)
-VALUES (?,?,?,?,NOW(),NOW())
-");
+        $stmt = $conn->prepare("INSERT INTO products (product_name,description,img,created_by,created_at,updated_at) VALUES (?,?,?,?,NOW(),NOW()) ");
 
-$stmt->execute([
-$product_name,
-$description,
-$image_name,
-$created_by
-]);
+        $stmt->execute([
+            $product_name,
+            $description,
+            $image_name,
+            $created_by
+        ]);
 
-$product_id = $conn->lastInsertId();
+        $product_id = $conn->lastInsertId();
 
-foreach($suppliers as $supplier){
+        foreach ($suppliers as $supplier) {
 
-$stmt = $conn->prepare("
-INSERT INTO productsupplier
-(supplier,product)
-VALUES (?,?)
-");
+            $stmt = $conn->prepare("INSERT INTO productsupplier (supplier,product) VALUES (?,?) ");
 
-$stmt->execute([
-$supplier,
-$product_id
-]);
+            $stmt->execute([
+                $supplier,
+                $product_id
+            ]);
 
-}
+        }
 
-$conn->commit();
+        $conn->commit();
 
-$_SESSION['response']=[
-'success'=>true,
-'message'=>'Product created successfully'
-];
+        $_SESSION['response'] = [
+            'success' => true,
+            'message' => 'Product created successfully'
+        ];
 
-}catch(PDOException $e){
+    } catch (PDOException $e) {
 
-$conn->rollBack();
+        $conn->rollBack();
 
-$_SESSION['response']=[
-'success'=>false,
-'message'=>$e->getMessage()
-];
+        $_SESSION['response'] = [
+            'success' => false,
+            'message' => $e->getMessage()
+        ];
+
+    }
 
 }
 
+if ($table_name == 'supplier') {
+
+    $supplier_name = $_POST['supplier_name'];
+    $supplier_location = $_POST['supplier_location'];
+    $email = $_POST['email'];
+
+    $user = $_SESSION['user'];
+    $created_by = $user['id'];
+
+    try {
+
+        $stmt = $conn->prepare("INSERT INTO supplier (supplier_name,supplier_location,email,created_by,created_at,updated_at) VALUES (?,?,?,?,NOW(),NOW())");
+
+        $stmt->execute([
+            $supplier_name,
+            $supplier_location,
+            $email,
+            $created_by
+        ]);
+
+        $_SESSION['response'] = [
+            'success' => true,
+            'message' => 'Supplier created successfully'
+        ];
+
+    } catch (PDOException $e) {
+
+        $_SESSION['response'] = [
+            'success' => false,
+            'message' => $e->getMessage()
+        ];
+
+    }
+
 }
 
-header('location: ../product-add.php');
+$redirect = isset($_SESSION['redirect_to']) ? $_SESSION['redirect_to'] : 'product-add.php';
+header("location: ../$redirect");
 exit();

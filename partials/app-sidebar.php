@@ -1,6 +1,8 @@
 <?php
-    $user = $_SESSION['user'];
+$user = $_SESSION['user'];
+$current_page = basename($_SERVER['PHP_SELF']);
 ?>
+
 <div class="DashboardSidebar" id="DashboardSidebar">
 
     <div class="dashboard_logo">
@@ -22,6 +24,8 @@
     <ul class="dashboard_menu_list">
 
 
+        <!-- DASHBOARD -->
+
         <li class="liMenu <?= ($current_page == 'dashboard.php') ? 'active' : '' ?>">
 
             <a href="dashboard.php">
@@ -33,6 +37,8 @@
 
         </li>
 
+
+        <!-- REPORTS -->
 
         <li class="liMenu <?= ($current_page == 'reports.php') ? 'active' : '' ?>">
 
@@ -49,7 +55,7 @@
         <!-- PRODUCT -->
 
         <li class="liMenu has-submenu 
-            <?= ($current_page == 'products-view.php' || $current_page == 'products-add.php') ? 'open active' : '' ?>">
+        <?= ($current_page == 'product-view.php' || $current_page == 'product-add.php') ? 'open active' : '' ?>">
 
             <a href="#">
 
@@ -62,16 +68,22 @@
             <ul class="sub-menu">
 
                 <li>
-                    <a href="./product-view.php" class="<?= ($current_page == 'products-view.php') ? 'active' : '' ?>">
+                    <a href="product-view.php"
+                       class="<?= ($current_page == 'product-view.php') ? 'active' : '' ?>">
+
                         <i class="fa-solid fa-circle"></i>
                         <span class="menuText">View Products</span>
+
                     </a>
                 </li>
 
                 <li>
-                    <a href="./product-add.php" class="<?= ($current_page == 'products-add.php') ? 'active' : '' ?>">
+                    <a href="product-add.php"
+                       class="<?= ($current_page == 'product-add.php') ? 'active' : '' ?>">
+
                         <i class="fa-solid fa-circle"></i>
                         <span class="menuText">Add Products</span>
+
                     </a>
                 </li>
 
@@ -82,7 +94,8 @@
 
         <!-- SUPPLIER -->
 
-        <li class="liMenu has-submenu">
+        <li class="liMenu has-submenu
+        <?= ($current_page == 'supplier-view.php' || $current_page == 'supplier-add.php') ? 'open active' : '' ?>">
 
             <a href="#">
 
@@ -96,16 +109,22 @@
             <ul class="sub-menu">
 
                 <li>
-                    <a href="supplier-view.php">
+                    <a href="supplier-view.php"
+                       class="<?= ($current_page == 'supplier-view.php') ? 'active' : '' ?>">
+
                         <i class="fa-solid fa-circle"></i>
                         <span class="menuText">View Supplier</span>
+
                     </a>
                 </li>
 
                 <li>
-                    <a href="supplier-add.php">
+                    <a href="supplier-add.php"
+                       class="<?= ($current_page == 'supplier-add.php') ? 'active' : '' ?>">
+
                         <i class="fa-solid fa-circle"></i>
                         <span class="menuText">Add Supplier</span>
+
                     </a>
                 </li>
 
@@ -116,7 +135,8 @@
 
         <!-- PURCHASE ORDER -->
 
-        <li class="liMenu has-submenu">
+        <li class="liMenu has-submenu
+        <?= ($current_page == 'order-view.php' || $current_page == 'order-create.php') ? 'open active' : '' ?>">
 
             <a href="#">
 
@@ -130,16 +150,22 @@
             <ul class="sub-menu">
 
                 <li>
-                    <a href="order-create.php">
+                    <a href="order-view.php"
+                       class="<?= ($current_page == 'order-view.php') ? 'active' : '' ?>">
+
                         <i class="fa-solid fa-circle"></i>
-                        <span class="menuText">Create Order</span>
+                        <span class="menuText">View Orders</span>
+
                     </a>
                 </li>
 
                 <li>
-                    <a href="order-view.php">
+                    <a href="order-create.php"
+                       class="<?= ($current_page == 'order-create.php') ? 'active' : '' ?>">
+
                         <i class="fa-solid fa-circle"></i>
-                        <span class="menuText">View Orders</span>
+                        <span class="menuText">Create Order</span>
+
                     </a>
                 </li>
 
@@ -150,7 +176,8 @@
 
         <!-- USERS -->
 
-        <li class="liMenu has-submenu">
+        <li class="liMenu has-submenu
+        <?= ($current_page == 'users-view.php' || $current_page == 'users-add.php') ? 'open active' : '' ?>">
 
             <a href="#">
 
@@ -164,16 +191,22 @@
             <ul class="sub-menu">
 
                 <li>
-                    <a href="users-view.php">
+                    <a href="users-view.php"
+                       class="<?= ($current_page == 'users-view.php') ? 'active' : '' ?>">
+
                         <i class="fa-solid fa-circle"></i>
                         <span class="menuText">View Users</span>
+
                     </a>
                 </li>
 
                 <li>
-                    <a href="users-add.php">
+                    <a href="users-add.php"
+                       class="<?= ($current_page == 'users-add.php') ? 'active' : '' ?>">
+
                         <i class="fa-solid fa-circle"></i>
                         <span class="menuText">Add Users</span>
+
                     </a>
                 </li>
 

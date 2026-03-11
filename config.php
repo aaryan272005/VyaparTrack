@@ -1,0 +1,14 @@
+<?php
+
+$envFile = __DIR__ . '/.env';
+
+if (!file_exists($envFile)) {
+    die("Environment file (.env) not found.");
+}
+
+$env = parse_ini_file($envFile);
+
+define('DB_HOST', $env['DB_HOST'] ?? 'localhost');
+define('DB_NAME', $env['DB_NAME'] ?? '');
+define('DB_USER', $env['DB_USER'] ?? '');
+define('DB_PASS', $env['DB_PASS'] ?? '');

@@ -64,7 +64,7 @@ $users = include('database/show.php');
 
                         <p class="userCount"><?= count($users) ?> Users</p>
 
-                        <table>
+                        <table class="users">
 
                             <thead>
                                 <tr>
@@ -138,6 +138,7 @@ $users = include('database/show.php');
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script src="js/dashboard.js"></script>
     <script src="js/script.js"></script>
 
 </body>
