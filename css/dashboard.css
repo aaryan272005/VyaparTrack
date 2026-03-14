@@ -930,3 +930,77 @@ height:350px;
 .dashboard_menu_list li a{
     transition:all 0.25s ease;
 }
+/* =========================
+   REPORTS SECTION
+========================= */
+
+.reports-container{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:22px;
+    margin-top:25px;
+}
+
+/* REPORT CARD */
+
+.report-box{
+    background:#f7f8fa;
+    border:1px solid #e1e5ea;
+    padding:22px;
+    border-radius:8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    transition:all .25s ease;
+}
+
+/* CARD HOVER EFFECT */
+
+.report-box:hover{
+    background:#eef5ff;
+    border-color:#1e73ff;
+    transform:translateY(-3px);
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* TITLE */
+
+.report-title{
+    font-size:17px;
+    font-weight:600;
+}
+
+/* BUTTON CONTAINER */
+
+.report-buttons{
+    display:flex;
+    gap:10px;
+}
+
+/* BUTTON STYLE */
+
+.btn-report{
+    background:#1e73ff;
+    color:white;
+    border:none;
+    padding:7px 16px;
+    border-radius:4px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    transition:all .2s ease;
+}
+
+/* BUTTON HOVER */
+
+.btn-report:hover{
+    background:#0f5fe0;
+    transform:translateY(-1px);
+    box-shadow:0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* CLICK EFFECT */
+
+.btn-report:active{
+    transform:scale(.95);
+}
