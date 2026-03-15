@@ -64,7 +64,7 @@ document.querySelectorAll(".updateOrderBtn").forEach((btn) => {
             "Content-Type": "application/x-www-form-urlencoded",
           },
 
-          body:`order_id=${id}&quantity_delivered=${qty}&status=${status}`,
+          body: `order_id=${id}&quantity_delivered=${qty}&status=${status}`,
         }).then((res) => res.json());
       },
     }).then((result) => {
@@ -111,5 +111,58 @@ ${rows}
 `,
         });
       });
+  });
+});
+
+$(document).on("click", ".deleteOrderBtn", function (e) {
+  e.preventDefault();
+
+  let button = $(this);
+
+  let orderId = button.data("id");
+  let name = button.data("name");
+
+  let row = $("#orderRow" + orderId);
+
+  Swal.fire({
+    title: "Delete Order?",
+    text: "Are you sure you want to delete order for " + name + "?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        url: "database/delete-order.php",
+        type: "POST",
+        data: {
+          id: orderId,
+        },
+        success: function (response) {
+          if (response.trim() === "success") {
+            Swal.fire("Deleted!", "Order has been deleted.", "success");
+
+            /* ROW ANIMATION */
+            row.fadeOut(400, function () {
+              $(this).remove();
+
+              /* UPDATE ORDER COUNT */
+              let rows = $(".users tbody tr");
+
+              $(".userCount").text(rows.length + " Orders");
+
+              /* FIX ROW NUMBERS */
+              rows.each(function (index) {
+                $(this)
+                  .find("td:first")
+                  .text(index + 1);
+              });
+            });
+          }
+        },
+      });
+    }
   });
 });

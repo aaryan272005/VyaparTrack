@@ -98,18 +98,23 @@ $products = include('database/show.php');
                                         <td>
                                             <?php
 
-                                            $query = "SELECT supplier.supplier_name FROM productsupplier JOIN supplier ON supplier.id = productsupplier.supplier WHERE productsupplier.product = :product_id";
+                                            $query = "SELECT DISTINCT supplier.supplier_name FROM productsupplier JOIN supplier ON supplier.id = productsupplier.supplier WHERE productsupplier.product = :product_id";
 
                                             $stmt = $conn->prepare($query);
                                             $stmt->execute(['product_id' => $product['id']]);
 
                                             $suppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                                            if ($suppliers) {
-                                                foreach ($suppliers as $supplier) {
-                                                    echo $supplier['supplier_name'] . "<br>";
+                                            if (!empty($suppliers)) {
+
+                                                $names = array_column($suppliers, 'supplier_name');
+                                                $uniqueSuppliers = array_unique($names);
+
+                                                foreach ($uniqueSuppliers as $supplier) {
+                                                    echo $supplier . "<br>";
                                                 }
                                             } else {
+
                                                 echo "No Supplier";
                                             }
 

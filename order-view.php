@@ -107,7 +107,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
 
                                     <?php foreach ($orders as $index => $order) { ?>
 
-                                        <tr>
+                                        <tr id="orderRow<?= $order['id'] ?>">
 
                                             <td><?= $index + 1 ?></td>
                                             <td><?= $order['product_name'] ?></td>
@@ -141,6 +141,14 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
                                                 <button class="viewDeliveryBtn action-btn" data-id="<?= $order['id'] ?>">
 
                                                     <i class="fa fa-truck"></i> Deliveries
+
+                                                </button>
+
+                                                <button class="deleteOrderBtn action-btn deleteBtn"
+                                                    data-id="<?= $order['id'] ?>"
+                                                    data-name="<?= $order['product_name'] ?>">
+
+                                                    <i class="fa fa-trash"></i> Delete
 
                                                 </button>
 

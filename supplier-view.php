@@ -22,7 +22,7 @@ $query = "SELECT
     s.updated_at,
     u.first_name,
     u.last_name,
-    GROUP_CONCAT(p.product_name SEPARATOR ', ') AS products
+    GROUP_CONCAT(DISTINCT p.product_name SEPARATOR ', ') AS products
 FROM supplier s
 LEFT JOIN users u 
     ON s.created_by = u.id
@@ -120,30 +120,20 @@ $suppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                                             <?php
 
-                                            $productQuery = "SELECT p.product_name FROM productsupplier ps JOIN products p  ON ps.product = p.id WHERE ps.supplier = :supplier_id ";
+                                            if (!empty($supplier['products'])) {
 
-                                            $stmt = $conn->prepare($productQuery);
-
-                                            $stmt->execute([
-                                                'supplier_id' => $supplier['id']
-                                            ]);
-
-                                            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                                            if (!empty($products)) {
+                                                $products = explode(',', $supplier['products']);
 
                                                 echo "<ul>";
 
                                                 foreach ($products as $product) {
-                                                    echo "<li>" . $product['product_name'] . "</li>";
+                                                    echo "<li>" . trim($product) . "</li>";
                                                 }
 
                                                 echo "</ul>";
-
                                             } else {
 
                                                 echo "-";
-
                                             }
 
                                             ?>
