@@ -53,23 +53,24 @@ LEFT JOIN users u ON u.id = p.created_by
 
     case "suppliers":
 
-        $query = "
-SELECT
-s.supplier_name AS Supplier,
-s.supplier_location AS Location,
-s.email AS Email,
-CONCAT(u.first_name,' ',u.last_name) AS Created_By,
-DATE_FORMAT(s.created_at,'%d-%m-%Y %H:%i') AS Created_At,
-DATE_FORMAT(s.updated_at,'%d-%m-%Y %H:%i') AS Updated_At
+        $query = " SELECT 
+    s.supplier_name AS 'Supplier Name',
+    s.supplier_location AS 'Supplier Location',
+    s.email AS 'Contact Details',
+    GROUP_CONCAT(DISTINCT p.product_name SEPARATOR '\n') AS 'Products',
+    CONCAT(u.first_name,' ',u.last_name) AS 'Created By',
+    s.created_at AS 'Created At',
+    s.updated_at AS 'Updated At'
 FROM supplier s
-LEFT JOIN users u ON u.id = s.created_by
-$dateFilter
-";
-
+LEFT JOIN users u 
+    ON s.created_by = u.id
+LEFT JOIN productsupplier ps 
+    ON s.id = ps.supplier
+LEFT JOIN products p 
+    ON ps.product = p.id
+GROUP BY s.id
+ORDER BY s.id";
         break;
-
-        break;
-
 
     case "orders":
 
@@ -156,45 +157,36 @@ if ($format == "excel") {
     exit;
 }
 
+
 /* ========================
-   PROFESSIONAL PDF EXPORT
+   DYNAMIC PDF EXPORT
 ======================== */
 
 if ($format == "pdf") {
 
     class PDF extends FPDF
     {
-
         function Header()
         {
-
             $logoWidth = 35;
             $pageWidth = $this->GetPageWidth();
 
-            /* CENTER LOGO */
-
             $x = ($pageWidth - $logoWidth) / 2;
-
             $this->Image('../images/logo.png', $x, 8, $logoWidth);
 
-            /* SPACE BELOW LOGO */
-
             $this->Ln(15);
-
-            /* TITLE */
 
             $this->SetFont('Arial', 'B', 16);
             $this->Cell(0, 10, 'VyaparTrack Inventory System', 0, 1, 'C');
 
             $this->SetFont('Arial', '', 11);
-            $this->Cell(0, 6, 'Inventory Report', 0, 1, 'C');
+            $this->Cell(0, 6, ucfirst($GLOBALS['type']) . ' Report', 0, 1, 'C');
 
             $this->Ln(5);
         }
 
         function Footer()
         {
-
             $this->SetY(-15);
             $this->SetFont('Arial', 'I', 8);
             $this->Cell(0, 10, 'Page ' . $this->PageNo() . '/{nb}', 0, 0, 'C');
@@ -207,103 +199,156 @@ if ($format == "pdf") {
 
     $pdf->SetFont('Arial', 'B', 9);
 
-    /* COLUMN WIDTHS */
 
-    $widths = [30, 35, 80, 35, 45, 35, 35];
+    /* ----------------------
+COLUMN WIDTHS
+----------------------- */
 
-    /* TABLE HEADER */
+    $columnCount = count($rows[0]);
 
-    if (!empty($rows)) {
+    /* Custom widths for products report */
+    if ($type == "products") {
+        $widths = [35, 40, 65, 40, 40, 35, 35];
+    } else {
 
-        $i = 0;
+        /* dynamic widths for other reports */
+        $pageWidth = 277;
+        $cellWidth = $pageWidth / $columnCount;
 
-        foreach (array_keys($rows[0]) as $column) {
-            $pdf->SetFillColor(230, 230, 230);
-            $pdf->Cell($widths[$i], 10, $column, 1, 0, 'C', true);
-            $i++;
-        }
-
-        $pdf->Ln();
-
-        $pdf->SetFont('Arial', '', 9);
-
-        /* TABLE DATA */
-
-        foreach ($rows as $row) {
-
-            $xStart = $pdf->GetX();
-            $yStart = $pdf->GetY();
-
-            /* IMAGE COLUMN */
-
-            $imageName = $row['Image'] ?? '';
-
-            $imageFile = "../uploads/products/" . $imageName;
-
-            $pdf->Cell($widths[0], 20, '', 1);
-
-            if (!empty($imageName) && file_exists($imageFile)) {
-
-                $ext = strtolower(pathinfo($imageFile, PATHINFO_EXTENSION));
-
-                if ($ext == 'webp') {
-
-                    $webp = imagecreatefromwebp($imageFile);
-
-                    $tempImage = "../uploads/products/temp_" . $row['Product'] . ".png";
-
-                    imagepng($webp, $tempImage);
-
-                    imagedestroy($webp);
-
-                    $pdf->Image($tempImage, $xStart + 2, $yStart + 2, 15);
-                } else {
-
-                    $pdf->Image($imageFile, $xStart + 2, $yStart + 2, 15);
-                }
-            } else {
-
-                $pdf->SetXY($xStart + 2, $yStart + 7);
-                $pdf->SetFont('Arial', 'I', 8);
-                $pdf->Cell(30, 5, 'No Image');
-            }
-            $pdf->SetXY($xStart + $widths[0], $yStart);
-
-            /* PRODUCT */
-
-            $pdf->Cell($widths[1], 20, $row['Product'], 1);
-
-            /* DESCRIPTION (WRAPPED) */
-
-            $xCurrent = $pdf->GetX();
-            $yCurrent = $pdf->GetY();
-
-            $pdf->MultiCell($widths[2], 5, $row['Description'], 1);
-
-            $yAfterDesc = $pdf->GetY();
-
-            $pdf->SetXY($xCurrent + $widths[2], $yCurrent);
-
-            /* SUPPLIER */
-
-            $pdf->Cell($widths[3], 20, $row['Supplier'], 1);
-
-            /* CREATED BY */
-
-            $pdf->Cell($widths[4], 20, $row['Created_By'], 1);
-
-            /* CREATED AT */
-
-            $pdf->Cell($widths[5], 20, $row['Created_At'], 1);
-
-            /* UPDATED AT */
-            $pdf->Cell($widths[6], 20, $row['Updated_At'], 1, 0, 'C');
-
-            $pdf->Ln();
+        $widths = [];
+        for ($i = 0; $i < $columnCount; $i++) {
+            $widths[] = $cellWidth;
         }
     }
 
-    $pdf->Output($type . '_report.pdf', 'D');
+
+    /* ----------------------
+CENTER TABLE
+----------------------- */
+
+    $tableWidth = array_sum($widths);
+    $pageRealWidth = $pdf->GetPageWidth();
+    $centerX = ($pageRealWidth - $tableWidth) / 2;
+
+    $pdf->SetX($centerX);
+
+
+    /* ----------------------
+TABLE HEADER
+----------------------- */
+
+    $i = 0;
+
+    foreach (array_keys($rows[0]) as $column) {
+
+        $pdf->SetFillColor(230, 230, 230);
+        $pdf->Cell($widths[$i], 10, $column, 1, 0, 'C', true);
+
+        $i++;
+    }
+
+    $pdf->Ln();
+
+    $pdf->SetFont('Arial', '', 9);
+
+
+    /* ----------------------
+TABLE ROWS
+----------------------- */
+
+    foreach ($rows as $row) {
+
+        $pdf->SetX($centerX);
+
+        $lineHeight = 6;
+
+        /* Row height calculation */
+        $desc = $row['Description'] ?? '';
+        $nbLines = ceil($pdf->GetStringWidth($desc) / ($widths[2] ?? 40));
+
+        if ($nbLines < 1) $nbLines = 1;
+
+        $rowHeight = $nbLines * $lineHeight;
+
+        if ($rowHeight < 20) $rowHeight = 20;
+
+        $yStart = $pdf->GetY();
+
+        $colIndex = 0;
+
+        foreach ($row as $key => $value) {
+
+            $width = $widths[$colIndex] ?? 40;
+
+
+            /* IMAGE COLUMN */
+
+            if ($type == 'products' && $key == 'Image') {
+
+                $imageFile = "../uploads/products/" . $value;
+
+                $pdf->Cell($width, $rowHeight, '', 1);
+
+                if (!empty($value) && file_exists($imageFile)) {
+
+                    $ext = strtolower(pathinfo($imageFile, PATHINFO_EXTENSION));
+
+                    if ($ext == 'webp') {
+
+                        $webp = imagecreatefromwebp($imageFile);
+                        $tempImage = "../uploads/products/temp_" . uniqid() . ".png";
+
+                        imagepng($webp, $tempImage);
+                        imagedestroy($webp);
+
+                        $pdf->Image(
+                            $tempImage,
+                            $pdf->GetX() - $width + ($width / 2) - 7,
+                            $yStart + ($rowHeight / 2) - 7,
+                            15
+                        );
+
+                        unlink($tempImage);
+                    } else {
+
+                        $pdf->Image(
+                            $imageFile,
+                            $pdf->GetX() - $width + ($width / 2) - 7,
+                            $yStart + ($rowHeight / 2) - 7,
+                            15
+                        );
+                    }
+                }
+            }
+
+
+            /* DESCRIPTION COLUMN */ elseif ($key == 'Description') {
+
+                $text = substr($value, 0, 50); // limit length to keep row height clean
+
+                $pdf->Cell($width, $rowHeight, $text, 1, 0, 'L');
+            }
+
+
+            /* NORMAL CELLS */ else {
+
+                $pdf->Cell($width, $rowHeight, $value, 1, 0, 'C');
+            }
+
+            $colIndex++;
+        }
+
+        $pdf->Ln($rowHeight);
+    }
+
+
+    /* ----------------------
+FILE NAME
+----------------------- */
+
+    $filename = $type . '_report_' . date('Ymd_His') . '.pdf';
+
+    $pdf->Output($filename, 'D');
 
     exit;
 }

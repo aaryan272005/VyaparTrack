@@ -68,7 +68,7 @@ $_SESSION['redirect_to'] = 'reports.php';
                                     <a href="database/export.php?type=suppliers&format=excel">
                                         <button class="btn-report">EXCEL</button>
                                     </a>
-                                    <a href="database/export.php?type=products&format=pdf">
+                                    <a href="database/export.php?type=suppliers&format=pdf">
                                         <button class="btn-report">PDF</button>
                                     </a>
                                 </div>
@@ -83,7 +83,7 @@ $_SESSION['redirect_to'] = 'reports.php';
                                     <a href="database/export.php?type=deliveries&format=excel">
                                         <button class="btn-report">EXCEL</button>
                                     </a>
-                                    <a href="database/export.php?type=products&format=pdf">
+                                    <a href="database/export.php?type=deliveries&format=pdf">
                                         <button class="btn-report">PDF</button>
                                     </a>
                                 </div>
@@ -98,7 +98,7 @@ $_SESSION['redirect_to'] = 'reports.php';
                                     <a href="database/export.php?type=orders&format=excel">
                                         <button class="btn-report">EXCEL</button>
                                     </a>
-                                    <a href="database/export.php?type=products&format=pdf">
+                                    <a href="database/export.php?type=orders&format=pdf">
                                         <button class="btn-report">PDF</button>
                                     </a>
                                 </div>
