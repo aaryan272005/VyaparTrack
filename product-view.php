@@ -28,7 +28,7 @@ $products = include('database/show.php');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>View Products</title>
+    <title>View Products ~VyaparTrack</title>
 
     <link rel="stylesheet" href="css/dashboard.css">
 

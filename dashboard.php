@@ -47,7 +47,7 @@ $total_orders = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Dashboard - VyaparTrack</title>
+    <title>Dashboard  ~VyaparTrack</title>
 
     <!-- MAIN CSS -->
     <link rel="stylesheet" href="css/dashboard.css">

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VyaparTrack Homepage- Inventory Management System</title>
+    <title>VyaparTrack Homepage ~Inventory Management System</title>
     <link rel="stylesheet" href="css/login.css">
     <!-- <script src="https://use.fontawesome.com/0c7a3095b5.js"></script> -->
 </head>

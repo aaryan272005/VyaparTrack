@@ -53,7 +53,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
 <head>
 
     <meta charset="UTF-8">
-    <title>View Orders</title>
+    <title>View Orders ~VyaparTrack</title>
 
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/order.css">
