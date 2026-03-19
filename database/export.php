@@ -34,6 +34,7 @@ SELECT
 p.img AS Image,
 p.product_name AS Product,
 p.description AS Description,
+
 (
     SELECT s.supplier_name
     FROM productsupplier ps
@@ -41,11 +42,41 @@ p.description AS Description,
     WHERE ps.product = p.id
     LIMIT 1
 ) AS Supplier,
+
+COALESCE(SUM(
+    CASE 
+        WHEN st.type = 'IN' THEN st.quantity
+        WHEN st.type = 'OUT' THEN -st.quantity
+    END
+), 0) AS Stock,
+
+CASE 
+    WHEN COALESCE(SUM(
+        CASE 
+            WHEN st.type = 'IN' THEN st.quantity
+            WHEN st.type = 'OUT' THEN -st.quantity
+        END
+    ), 0) = 0 THEN 'Out of Stock'
+
+    WHEN COALESCE(SUM(
+        CASE 
+            WHEN st.type = 'IN' THEN st.quantity
+            WHEN st.type = 'OUT' THEN -st.quantity
+        END
+    ), 0) < 10 THEN 'Low Stock'
+
+    ELSE 'In Stock'
+END AS Status,
+
 CONCAT(u.first_name,' ',u.last_name) AS Created_By,
 DATE_FORMAT(p.created_at,'%d-%m-%Y %H:%i') AS Created_At,
 DATE_FORMAT(p.updated_at,'%d-%m-%Y %H:%i') AS Updated_At
+
 FROM products p
 LEFT JOIN users u ON u.id = p.created_by
+LEFT JOIN stock st ON st.product_id = p.id
+
+GROUP BY p.id
 ";
 
         break;
@@ -152,6 +183,8 @@ if ($format == "excel") {
     /* BASIC STYLING */
 
     $xlsx->setDefaultFont('Calibri');
+    ob_end_clean();
+    ob_start();
     $xlsx->downloadAs($type . "_report.xlsx");
 
     exit;
@@ -206,18 +239,35 @@ COLUMN WIDTHS
 
     $columnCount = count($rows[0]);
 
-    /* Custom widths for products report */
     if ($type == "products") {
-        $widths = [35, 40, 65, 40, 40, 35, 35];
+
+        $widths = [30, 35, 60, 35, 25, 25, 35, 30, 30];
+    } elseif ($type == "suppliers") {
+
+        $widths = [50, 60, 60, 70, 50, 50, 50];
+    } elseif ($type == "orders") {
+
+        $widths = [60, 50, 30, 30, 30, 40, 50, 50, 50];
+    } elseif ($type == "deliveries") {
+
+        $widths = [60, 60, 80];
     } else {
 
-        /* dynamic widths for other reports */
-        $pageWidth = 277;
-        $cellWidth = $pageWidth / $columnCount;
+        // fallback (VERY IMPORTANT)
+        $widths = array_fill(0, $columnCount, 40);
+    }
 
-        $widths = [];
-        for ($i = 0; $i < $columnCount; $i++) {
-            $widths[] = $cellWidth;
+
+    /* SCALE TO FIT PAGE */
+
+    $totalWidth = array_sum($widths);
+    $pageWidth = 277;
+
+    if ($totalWidth > $pageWidth) {
+        $scale = $pageWidth / $totalWidth;
+
+        foreach ($widths as $i => $w) {
+            $widths[$i] = $w * $scale;
         }
     }
 
@@ -330,13 +380,45 @@ TABLE ROWS
             }
 
 
-            /* NORMAL CELLS */ else {
+            /* NORMAL CELLS */ /* NORMAL CELLS */ else {
+
+                // Apply color only for Status column
+                if ($key == 'Status') {
+
+                    /* PRODUCT STATUS */
+                    if ($type == 'products') {
+
+                        if ($value == 'Out of Stock') {
+                            $pdf->SetTextColor(200, 0, 0);
+                        } elseif ($value == 'Low Stock') {
+                            $pdf->SetTextColor(255, 165, 0);
+                        } else {
+                            $pdf->SetTextColor(0, 150, 0);
+                        }
+                    }
+
+                    /* ORDER STATUS */ elseif ($type == 'orders') {
+
+                        if ($value == 'COMPLETE') {
+                            $pdf->SetTextColor(0, 150, 0); // green
+                        } elseif ($value == 'INCOMPLETE') {
+                            $pdf->SetTextColor(255, 165, 0); // orange
+                        } elseif ($value == 'PENDING') {
+                            $pdf->SetTextColor(200, 0, 0); // red
+                        } else {
+                            $pdf->SetTextColor(0, 0, 0);
+                        }
+                    }
+                }
 
                 $pdf->Cell($width, $rowHeight, $value, 1, 0, 'C');
-            }
 
+                // Reset color after each cell
+                $pdf->SetTextColor(0, 0, 0);
+            }
             $colIndex++;
         }
+
 
         $pdf->Ln($rowHeight);
     }

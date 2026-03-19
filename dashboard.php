@@ -144,7 +144,7 @@ $total_orders = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
                     <h2>Welcome, <?= $user['first_name']; ?> 👋</h2>
 
                     <p>
-                        This is your dashboard. Use the sidebar to manage products, suppliers, orders and users.
+                        This is your dashboard. Use the sidebar to manage reports, products, suppliers, orders and users.
                     </p>
 
 

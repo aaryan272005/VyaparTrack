@@ -4,7 +4,7 @@ date_default_timezone_set('Asia/Kolkata');
 
 session_start();
 
-if(!isset($_SESSION['user'])){
+if (!isset($_SESSION['user'])) {
     echo json_encode([
         'success' => false,
         'message' => 'User not logged in'
@@ -14,7 +14,7 @@ if(!isset($_SESSION['user'])){
 
 include('connection.php');
 
-try{
+try {
 
     $order_id = $_POST['order_id'];
     $quantity_delivered = $_POST['quantity_delivered'];
@@ -29,10 +29,10 @@ try{
 
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if(!$order){
+    if (!$order) {
         echo json_encode([
-            'success'=>false,
-            'message'=>'Order not found'
+            'success' => false,
+            'message' => 'Order not found'
         ]);
         exit();
     }
@@ -45,7 +45,7 @@ try{
     $new_received = $current_received + $quantity_delivered;
     $remaining = $quantity_order - $new_received;
 
-    if($remaining < 0){
+    if ($remaining < 0) {
         $remaining = 0;
     }
 
@@ -64,7 +64,7 @@ try{
 
     /* INSERT DELIVERY HISTORY */
 
-    if($quantity_delivered > 0){
+    if ($quantity_delivered > 0) {
 
         $historyQuery = "INSERT INTO delivery_history (order_id, quantity_received, date_received) VALUES (?, ?, NOW()) ";
 
@@ -75,17 +75,42 @@ try{
             $quantity_delivered
         ]);
     }
+    /* UPDATE STOCK */
+
+    if ($quantity_delivered > 0) {
+
+        // Step 1: get product_id
+        $stmt = $conn->prepare("SELECT product FROM productsupplier WHERE id = ?");
+        $stmt->execute([$order_id]);
+        $product_id = $stmt->fetchColumn();
+
+        file_put_contents('debug.txt', "PRODUCT ID: " . $product_id . "\n", FILE_APPEND);
+
+        if (!$product_id) {
+            file_put_contents('debug.txt', "NO PRODUCT ID\n", FILE_APPEND);
+            exit();
+        }
+
+        // Step 2: insert/update stock
+        $stmt = $conn->prepare("
+        INSERT INTO stock (product_id, quantity)
+        VALUES (?, ?)
+        ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)
+    ");
+
+        $stmt->execute([$product_id, $quantity_delivered]);
+
+        file_put_contents('debug.txt', "STOCK UPDATED\n", FILE_APPEND);
+    }
 
     echo json_encode([
-        'success'=>true,
-        'message'=>'Order updated successfully'
+        'success' => true,
+        'message' => 'Order updated successfully'
     ]);
-
-}catch(PDOException $e){
+} catch (PDOException $e) {
 
     echo json_encode([
-        'success'=>false,
-        'message'=>$e->getMessage()
+        'success' => false,
+        'message' => $e->getMessage()
     ]);
-
 }

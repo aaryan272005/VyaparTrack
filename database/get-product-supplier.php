@@ -4,7 +4,7 @@ include('connection.php');
 
 $product_id = $_GET['product_id'];
 
-$stmt = $conn->prepare("SELECT supplier.id, supplier.supplier_name FROM supplier JOIN productsupplier ON productsupplier.supplier = supplier.id WHERE productsupplier.product = ? ");
+$stmt = $conn->prepare("SELECT DISTINCT supplier.id, supplier.supplier_name FROM supplier JOIN productsupplier ON productsupplier.supplier = supplier.id WHERE productsupplier.product = ? ");
 
 $stmt->execute([$product_id]);
 

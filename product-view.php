@@ -1,22 +1,20 @@
 <?php
 
 date_default_timezone_set('Asia/Kolkata');
-/* SAFE SESSION START */
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-/* LOGIN CHECK */
 if (!isset($_SESSION['user'])) {
     header('Location: login.php');
     exit();
 }
 
+include('database/connection.php');
+
 $_SESSION['table'] = 'products';
-
-/* FETCH USERS */
 $products = include('database/show.php');
-
 
 ?>
 
@@ -24,157 +22,158 @@ $products = include('database/show.php');
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>View Products ~VyaparTrack</title>
 
     <link rel="stylesheet" href="css/dashboard.css">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 </head>
 
 <body>
 
-    <div id="DashboardMainContainer">
+<div id="DashboardMainContainer">
 
-        <!-- SIDEBAR -->
-        <?php include('partials/app-sidebar.php'); ?>
+    <?php include('partials/app-sidebar.php'); ?>
 
-        <!-- MAIN CONTENT -->
-        <div class="DashboardContent_container" id="DashboardContent_container">
+    <div class="DashboardContent_container">
 
-            <!-- TOP NAV -->
-            <?php include('partials/app-topNav.php'); ?>
+        <?php include('partials/app-topNav.php'); ?>
 
+        <div class="dashboardContent">
 
-            <div class="dashboardContent">
+            <div class="dashboard_content_main">
 
-                <div class="dashboard_content_main">
+                <h1 class="section_header">
+                    <i class="fa fa-list"></i> List of Products
+                </h1>
 
-                    <h1 class="section_header">
-                        <i class="fa fa-list"></i> List of Products
-                    </h1>
+                <div class="users">
 
+                    <p class="userCount"><?= count($products) ?> Products</p>
 
-                    <div class="users">
+                    <table class="products">
 
-                        <p class="userCount"><?= count($products) ?> Products</p>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Image</th>
+                                <th>Product Name</th>
+                                <th>Description</th>
+                                <th>Supplier</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Created By</th>
+                                <th>Created At</th>
+                                <th>Updated At</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
 
-                        <table class="products">
+                        <tbody>
 
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Image</th>
-                                    <th>Product Name</th>
-                                    <th>Description</th>
-                                    <th>Supplier</th>
-                                    <th>Created By</th>
-                                    <th>Created At</th>
-                                    <th>Updated At</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
+                        <?php foreach ($products as $index => $product) { ?>
 
-                            <tbody>
+                            <?php
+                            // 🔥 FETCH STOCK USING product_id
+                            $stmt = $conn->prepare("SELECT quantity FROM stock WHERE product_id = ?");
+                            $stmt->execute([$product['id']]);
+                            $stock = $stmt->fetch(PDO::FETCH_ASSOC);
+                            $qty = $stock['quantity'] ?? 0;
+                            ?>
 
-                                <?php foreach ($products as $index => $product) { ?>
+                            <tr>
 
-                                    <tr>
+                                <td><?= $index + 1 ?></td>
 
-                                        <td><?= $index + 1 ?></td>
+                                <td>
+                                    <img src="uploads/products/<?= $product['img'] ?>" width="60">
+                                </td>
 
-                                        <td class="fname">
-                                            <img src="uploads/products/<?= $product['img'] ?>" width="60">
-                                        </td>
+                                <td><?= $product['product_name'] ?></td>
 
-                                        <td class="lname"><?= $product['product_name'] ?></td>
+                                <td><?= $product['description'] ?></td>
 
-                                        <td class="email"><?= $product['description'] ?></td>
+                                <!-- SUPPLIERS -->
+                                <td>
+                                    <?php
+                                    $query = "SELECT DISTINCT supplier.supplier_name 
+                                              FROM productsupplier 
+                                              JOIN supplier ON supplier.id = productsupplier.supplier 
+                                              WHERE productsupplier.product = :product_id";
 
-                                        <td>
-                                            <?php
+                                    $stmt = $conn->prepare($query);
+                                    $stmt->execute(['product_id' => $product['id']]);
 
-                                            $query = "SELECT DISTINCT supplier.supplier_name FROM productsupplier JOIN supplier ON supplier.id = productsupplier.supplier WHERE productsupplier.product = :product_id";
+                                    $suppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                                            $stmt = $conn->prepare($query);
-                                            $stmt->execute(['product_id' => $product['id']]);
+                                    if (!empty($suppliers)) {
+                                        foreach ($suppliers as $s) {
+                                            echo $s['supplier_name'] . "<br>";
+                                        }
+                                    } else {
+                                        echo "No Supplier";
+                                    }
+                                    ?>
+                                </td>
 
-                                            $suppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                <!-- STOCK -->
+                                <td><?= $qty ?></td>
 
-                                            if (!empty($suppliers)) {
+                                <!-- STATUS -->
+                                <td>
+                                    <?php
+                                    if ($qty == 0) {
+                                        echo "<span style='color:red;font-weight:bold'>Out of Stock</span>";
+                                    } elseif ($qty < 20) {
+                                        echo "<span style='color:orange;font-weight:bold'>Low Stock</span>";
+                                    } else {
+                                        echo "<span style='color:green;font-weight:bold'>In Stock</span>";
+                                    }
+                                    ?>
+                                </td>
 
-                                                $names = array_column($suppliers, 'supplier_name');
-                                                $uniqueSuppliers = array_unique($names);
+                                <!-- CREATED BY -->
+                                <td>
+                                    <?php
+                                    $stmt = $conn->prepare("SELECT first_name FROM users WHERE id = ?");
+                                    $stmt->execute([$product['created_by']]);
+                                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                                                foreach ($uniqueSuppliers as $supplier) {
-                                                    echo $supplier . "<br>";
-                                                }
-                                            } else {
+                                    echo $user['first_name'] ?? '';
+                                    ?>
+                                </td>
 
-                                                echo "No Supplier";
-                                            }
+                                <td><?= date('M d,Y @h:i:s A', strtotime($product['created_at'])) ?></td>
 
-                                            ?>
-                                        </td>
+                                <td><?= date('M d,Y @h:i:s A', strtotime($product['updated_at'])) ?></td>
 
+                                <!-- ACTION -->
+                                <td class="actionCell">
 
-                                        <!-- CREATED BY -->
-                                        <td>
-                                            <?php
+                                    <a href="#" class="action-btn editProduct editBtn"
+                                       data-pid="<?= $product['id'] ?>"
+                                       data-name="<?= $product['product_name'] ?>"
+                                       data-description="<?= $product['description'] ?>">
 
-                                            $query = "SELECT first_name
-                                                        FROM users
-                                                        WHERE id = :user_id";
+                                        <i class="fa fa-pencil"></i> Edit
+                                    </a>
 
-                                            $stmt = $conn->prepare($query);
-                                            $stmt->execute(['user_id' => $product['created_by']]);
+                                    <a href="#" class="action-btn deleteProduct deleteBtn"
+                                       data-id="<?= $product['id'] ?>"
+                                       data-table="products"
+                                       data-name="<?= $product['product_name'] ?>">
 
-                                            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                                        <i class="fa fa-trash"></i> Delete
+                                    </a>
 
-                                            echo $user['first_name'];
+                                </td>
 
-                                            ?>
-                                        </td>
+                            </tr>
 
+                        <?php } ?>
 
-                                        <td><?= date('M d,Y  @h:i:s A', strtotime($product['created_at'])) ?></td>
-
-                                        <td><?= date('M d,Y  @h:i:s A', strtotime($product['updated_at'])) ?></td>
-
-
-                                        <td class="actionCell">
-
-                                            <a href="#" class="action-btn editProduct editBtn"
-                                                data-pid="<?= $product['id'] ?>" data-name="<?= $product['product_name'] ?>"
-                                                data-description="<?= $product['description'] ?>">
-
-                                                <i class="fa fa-pencil"></i> Edit
-
-                                            </a>
-
-
-                                            <a href="#" class="action-btn deleteProduct deleteBtn"
-                                                data-id="<?= $product['id'] ?>" data-table="products"
-                                                data-name="<?= $product['product_name'] ?>">
-
-                                                <i class="fa fa-trash"></i> Delete
-
-                                            </a>
-
-                                        </td>
-
-                                    </tr>
-
-                                <?php } ?>
-
-                            </tbody>
-                        </table>
-
-                    </div>
+                        </tbody>
+                    </table>
 
                 </div>
 
@@ -184,12 +183,12 @@ $products = include('database/show.php');
 
     </div>
 
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="js/dashboard.js"></script>
-    <script src="js/script.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/script.js"></script>
 
 </body>
-
 </html>
