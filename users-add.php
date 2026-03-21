@@ -48,7 +48,7 @@ $_SESSION['redirect_to'] = 'users-add.php';
 
                     <div id="userAddFormContainer">
 
-                        <form action="database/add-users.php" method="POST" class="userForm">
+                        <form action="database/add.php" method="POST" class="userForm">
 
                             <label>First Name:</label>
                             <input type="text" name="first_name">

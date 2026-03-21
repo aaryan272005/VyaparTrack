@@ -1,20 +1,31 @@
 <?php
 
-/* SAFE SESSION START */
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-/* LOGIN CHECK */
-if (!isset($_SESSION['user'])) {
-    header('Location: login.php');
-    exit();
-}
-
-$user = $_SESSION['user'];
-
-/* DATABASE CONNECTION */
+require_once('partials/auth.php');
 require_once('database/connection.php');
+
+/* FETCH USER DATA */
+
+// ✅ use user_id (correct session variable)
+$user_id = $_SESSION['user_id'] ?? 0;
+
+// safety check
+if (!$user_id) {
+    die("Invalid session");
+}
+
+$stmt = $conn->prepare("SELECT * FROM users WHERE id = :id");
+$stmt->bindParam(':id', $user_id);
+$stmt->execute();
+
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// fallback safety
+if (!$user) {
+    die("User not found");
+}
+
+// ✅ safe role handling
+$role = $_SESSION['role'] ?? 'user';
 
 /* DETECT CURRENT PAGE */
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -37,6 +48,7 @@ $total_users = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 // Total Orders
 $stmt = $conn->query("SELECT COUNT(*) as total FROM productsupplier");
 $total_orders = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
 ?>
 
 <!DOCTYPE html>
@@ -47,7 +59,7 @@ $total_orders = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Dashboard  ~VyaparTrack</title>
+    <title>Dashboard ~ VyaparTrack</title>
 
     <!-- MAIN CSS -->
     <link rel="stylesheet" href="css/dashboard.css">
@@ -93,9 +105,6 @@ $total_orders = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
             color: #777;
         }
 
-
-        /* CHART SECTION */
-
         .dashboardCharts {
             display: flex;
             gap: 20px;
@@ -128,25 +137,29 @@ $total_orders = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
         <!-- SIDEBAR -->
         <?php include('partials/app-sidebar.php'); ?>
 
-
         <!-- MAIN CONTENT -->
         <div class="DashboardContent_container" id="DashboardContent_container">
 
             <!-- TOP NAV -->
             <?php include('partials/app-topNav.php'); ?>
 
-
             <!-- PAGE CONTENT -->
             <div class="dashboardContent">
 
                 <div class="dashboard_content_main">
 
-                    <h2>Welcome, <?= $user['first_name']; ?> 👋</h2>
+                    <h2>
+                        Welcome, <?= htmlspecialchars($user['first_name']); ?> (<?= htmlspecialchars($role); ?>) 👋
+                    </h2>
 
                     <p>
                         This is your dashboard. Use the sidebar to manage reports, products, suppliers, orders and users.
                     </p>
 
+                    <!-- ADMIN INDICATOR -->
+                    <?php if ($role === 'admin'): ?>
+                        <p style="color:green;"><b>You have admin access</b></p>
+                    <?php endif; ?>
 
                     <!-- DASHBOARD CARDS -->
 
@@ -185,8 +198,6 @@ $total_orders = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
                         </div>
                     </div>
 
-
-
                     <!-- DASHBOARD CHARTS -->
 
                     <div class="dashboardCharts">
@@ -203,13 +214,10 @@ $total_orders = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
                     </div>
 
-
                     <div class="chartBox">
                         <h3>Delivery History Per Day</h3>
                         <div id="deliveryHistoryChart"></div>
                     </div>
-
-
 
                 </div>
             </div>
@@ -218,14 +226,13 @@ $total_orders = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     </div>
 
-
-    <!-- DASHBOARD CHART SCRIPT -->
+    <!-- SCRIPTS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/10.3.3/highcharts.js"></script>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="js/dashboard.js"></script>
     <script src="js/dashboard-charts.js"></script>
     <script src="js/script.js"></script>
+
 </body>
 
 </html>

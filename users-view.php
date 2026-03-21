@@ -60,11 +60,15 @@ $users = include('database/show.php');
                     </h1>
 
 
+                    <div class="search-container">
+                        <input type="text" id="searchInput" class="user-search" placeholder="Search for users...">
+                    </div>
+
                     <div class="users">
 
                         <p class="userCount"><?= count($users) ?> Users</p>
 
-                        <table class="users">
+                        <table class="users" id="users_table">
 
                             <thead>
                                 <tr>

@@ -82,11 +82,15 @@ $suppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <i class="fa fa-list"></i> List of Suppliers
                     </h1>
 
-                    <div class="users">
+                    <div class="search-container">
+                    <input type="text" id="searchInput" class="supplier-search" placeholder="Search for suppliers...">
+                </div>
+
+                <div class="suppliers">
 
                         <p class="userCount"><?= count($suppliers) ?> Suppliers</p>
 
-                        <table class="suppliers">
+                        <table class="suppliers" id="suppliers_table">
 
                             <thead>
                                 <tr>

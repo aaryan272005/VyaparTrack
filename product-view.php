@@ -47,11 +47,15 @@ $products = include('database/show.php');
                     <i class="fa fa-list"></i> List of Products
                 </h1>
 
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="product-search" placeholder="Search for products...">
+                </div>
+
                 <div class="users">
 
                     <p class="userCount"><?= count($products) ?> Products</p>
 
-                    <table class="products">
+                    <table class="products" id="products_table">
 
                         <thead>
                             <tr>
@@ -89,9 +93,9 @@ $products = include('database/show.php');
                                     <img src="uploads/products/<?= $product['img'] ?>" width="60">
                                 </td>
 
-                                <td><?= $product['product_name'] ?></td>
+                                <td class="productName"><?= $product['product_name'] ?></td>
 
-                                <td><?= $product['description'] ?></td>
+                                <td class="productDescription"><?= $product['description'] ?></td>
 
                                 <!-- SUPPLIERS -->
                                 <td>

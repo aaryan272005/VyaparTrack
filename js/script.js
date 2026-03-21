@@ -54,7 +54,7 @@ $(document).on("click", ".deleteUser", function (e) {
     if (result.isConfirmed) {
       $.ajax({
         method: "POST",
-        url: "database/delete-user.php",
+        url: "database/delete.php",
         data: { user_id: userId },
         dataType: "json",
 
@@ -115,8 +115,9 @@ $(document).on("click", ".editUser", function (e) {
     if (result.isConfirmed) {
       $.ajax({
         method: "POST",
-        url: "database/update-user.php",
+        url: "database/update.php",
         data: {
+          table: 'users',
           user_id: userId,
           first_name: result.value.first_name,
           last_name: result.value.last_name,
@@ -128,14 +129,14 @@ $(document).on("click", ".editUser", function (e) {
           if (response.success) {
             let row = button.closest("tr");
 
-            row.find(".fname").text(result.value.first_name);
-            row.find(".lname").text(result.value.last_name);
-            row.find(".email").text(result.value.email);
+            row.find(".fname").text(response.first_name);
+            row.find(".lname").text(response.last_name);
+            row.find(".email").text(response.email);
 
             // IMPORTANT: update data attributes
-            button.attr("data-fname", result.value.first_name);
-            button.attr("data-lname", result.value.last_name);
-            button.attr("data-email", result.value.email);
+            button.attr("data-fname", response.first_name);
+            button.attr("data-lname", response.last_name);
+            button.attr("data-email", response.email);
 
             Swal.fire({
               icon: "success",
@@ -226,6 +227,7 @@ $(document).on("click", ".editProduct", function (e) {
     preConfirm: () => {
       let formData = new FormData();
 
+      formData.append("table", "products");
       formData.append("id", productId);
       formData.append(
         "product_name",
@@ -247,7 +249,7 @@ $(document).on("click", ".editProduct", function (e) {
     if (result.isConfirmed) {
       $.ajax({
         method: "POST",
-        url: "database/update-product.php",
+        url: "database/update.php",
         data: result.value,
         processData: false,
         contentType: false,
@@ -257,13 +259,17 @@ $(document).on("click", ".editProduct", function (e) {
           if (response.success) {
             let row = button.closest("tr");
 
-            row.find(".lname").text(response.product_name);
-            row.find(".email").text(response.description);
+            row.find(".productName").text(response.product_name);
+            row.find(".productDescription").text(response.description);
 
             // 🔥 This updates the image instantly
             if (response.img) {
               row.find(".productImages").attr("src", "uploads/" + response.img);
             }
+
+            // IMPORTANT: update data attributes
+            button.attr("data-name", response.product_name);
+            button.attr("data-description", response.description);
 
             Swal.fire({
               icon: "success",
@@ -313,10 +319,11 @@ $(document).on("click", ".editSupplier", function (e) {
   }).then((result) => {
     if (result.isConfirmed) {
       $.ajax({
-        url: "database/update-supplier.php",
+        url: "database/update.php",
         method: "POST",
 
         data: {
+          table: 'supplier',
           supplier_id: supplierId,
           supplier_name: result.value.supplier_name,
           supplier_location: result.value.supplier_location,
@@ -329,9 +336,14 @@ $(document).on("click", ".editSupplier", function (e) {
           if (response.success) {
             let row = button.closest("tr");
 
-            row.find(".supplierName").text(result.value.supplier_name);
-            row.find(".supplierLocation").text(result.value.supplier_location);
-            row.find(".supplierEmail").text(result.value.email);
+            row.find(".supplierName").text(response.supplier_name);
+            row.find(".supplierLocation").text(response.supplier_location);
+            row.find(".supplierEmail").text(response.email);
+
+            // IMPORTANT: update data attributes
+            button.attr("data-name", response.supplier_name);
+            button.attr("data-location", response.supplier_location);
+            button.attr("data-email", response.email);
 
             Swal.fire({
               icon: "success",
@@ -369,7 +381,7 @@ $(document).on("click", ".deleteSupplier", function (e) {
     if (result.isConfirmed) {
       $.ajax({
         method: "POST",
-        url: "database/delete-supplier.php",
+        url: "database/delete.php",
 
         data: { supplier_id: supplierId },
 
@@ -446,4 +458,25 @@ $(document).on("change", ".productSelect", function () {
 
 $(document).on("click", ".removeProduct", function () {
   $(this).closest(".orderRow").remove();
+});
+
+$("#searchInput.product-search").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#products_table tbody tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+});
+
+$("#searchInput.supplier-search").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#suppliers_table tbody tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+});
+
+$("#searchInput.user-search").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#users_table tbody tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
 });

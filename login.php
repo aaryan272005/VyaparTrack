@@ -1,11 +1,11 @@
 <?php
 // Start the session.
 session_start();
-if(isset($_SESSION['user'])) header('Location: dashboard.php');
+if (isset($_SESSION['user'])) header('Location: dashboard.php');
 
 $error_message = '';
 
-if($_POST){
+if ($_POST) {
     include('database/connection.php');
 
     $username = $_POST['username'];
@@ -15,13 +15,15 @@ if($_POST){
     $stmt = $conn->prepare($query);
     $stmt->execute();
 
-    if($stmt->rowCount() > 0){
+    if ($stmt->rowCount() > 0) {
         $stmt->setFetchMode(PDO::FETCH_ASSOC);
         $user = $stmt->fetchAll()[0];
 
         // Captures data of currently login users.
-        
-        $_SESSION['user'] = $user;
+
+        $_SESSION['user_id'] = $user['id'];   // for backend
+        $_SESSION['user'] = $user;           // for UI (name, email)
+        $_SESSION['role'] = $user['role'];
         $_SESSION['logged_in'] = true;
         header('Location: dashboard.php');
     } else {
@@ -32,44 +34,46 @@ if($_POST){
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VyaparTrack Login  ~Inventory Management System</title>
+    <title>VyaparTrack Login ~Inventory Management System</title>
     <link rel="stylesheet" href="css/login.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script>
-function togglePassword() {
-  let password = document.getElementById("password");
-  let toggleIcon = document.querySelector(".toggle");
+        function togglePassword() {
+            let password = document.getElementById("password");
+            let toggleIcon = document.querySelector(".toggle");
 
-  if (password.type === "password") {
-    password.type = "text";
-    toggleIcon.classList.remove("fa-eye");
-    toggleIcon.classList.add("fa-eye-slash");
-  } else {
-    password.type = "password";
-    toggleIcon.classList.remove("fa-eye-slash");
-    toggleIcon.classList.add("fa-eye");
-  }
-}
-setTimeout(() => {
-    let error = document.getElementById("error-message");
-    if(error){
-        error.classList.add("fade-out");
+            if (password.type === "password") {
+                password.type = "text";
+                toggleIcon.classList.remove("fa-eye");
+                toggleIcon.classList.add("fa-eye-slash");
+            } else {
+                password.type = "password";
+                toggleIcon.classList.remove("fa-eye-slash");
+                toggleIcon.classList.add("fa-eye");
+            }
+        }
         setTimeout(() => {
-            error.remove();
-        }, 600);
-    }
-}, 3000);
-</script>
+            let error = document.getElementById("error-message");
+            if (error) {
+                error.classList.add("fade-out");
+                setTimeout(() => {
+                    error.remove();
+                }, 600);
+            }
+        }, 3000);
+    </script>
 </head>
+
 <body id="login_body">
-    <?php if(!empty($error_message)) { ?>
-    <div id="error-message">
-        <i class="fas fa-exclamation-circle"></i> <?= $error_message ?>
-    </div>
+    <?php if (!empty($error_message)) { ?>
+        <div id="error-message">
+            <i class="fas fa-exclamation-circle"></i> <?= $error_message ?>
+        </div>
     <?php } ?>
     <div class="login-container">
         <div class="login-box">
@@ -106,4 +110,5 @@ setTimeout(() => {
         </div>
     </div>
 </body>
+
 </html>

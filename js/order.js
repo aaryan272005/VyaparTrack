@@ -57,7 +57,7 @@ document.querySelectorAll(".updateOrderBtn").forEach((btn) => {
         let qty = document.getElementById("qtyDelivered").value;
         let status = document.getElementById("statusSelect").value;
 
-        return fetch("database/update-order.php", {
+        return fetch("database/update.php", {
           method: "POST",
 
           headers: {
@@ -135,7 +135,7 @@ $(document).on("click", ".deleteOrderBtn", function (e) {
   }).then((result) => {
     if (result.isConfirmed) {
       $.ajax({
-        url: "database/delete-order.php",
+        url: "database/delete.php",
         type: "POST",
         data: {
           id: orderId,
