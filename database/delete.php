@@ -12,8 +12,14 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // ✅ ADMIN ONLY
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    echo json_encode(['success' => false, 'message' => 'Access Denied']);
+if (($_SESSION['role'] ?? '') !== 'admin') {
+    $_SESSION['response'] = [
+        'success' => false,
+        'message' => 'Access Denied - Admin Only'
+    ];
+
+    $redirect = $_SESSION['redirect_to'] ?? 'dashboard.php';
+    header("location: ../$redirect");
     exit();
 }
 

@@ -11,7 +11,11 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
+// ✅ ADMIN CHECK
+$isAdmin = ($_SESSION['role'] ?? '') === 'admin';
+
 include('database/connection.php');
+
 $query = "SELECT 
     s.id,
     s.supplier_name,
@@ -24,12 +28,9 @@ $query = "SELECT
     u.last_name,
     GROUP_CONCAT(DISTINCT p.product_name SEPARATOR ', ') AS products
 FROM supplier s
-LEFT JOIN users u 
-    ON s.created_by = u.id
-LEFT JOIN productsupplier ps 
-    ON s.id = ps.supplier
-LEFT JOIN products p 
-    ON ps.product = p.id
+LEFT JOIN users u ON s.created_by = u.id
+LEFT JOIN productsupplier ps ON s.id = ps.supplier
+LEFT JOIN products p ON ps.product = p.id
 GROUP BY 
     s.id,
     s.supplier_name,
@@ -67,7 +68,6 @@ $suppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div id="DashboardMainContainer">
 
-        <!-- SIDEBAR -->
         <?php include('partials/app-sidebar.php'); ?>
 
         <div class="DashboardContent_container">
@@ -82,15 +82,18 @@ $suppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <i class="fa fa-list"></i> List of Suppliers
                     </h1>
 
-                    <div class="search-container">
-                    <input type="text" id="searchInput" class="supplier-search" placeholder="Search for suppliers...">
-                </div>
+                    <!-- ⚠ WARNING -->
+                    <?php if (!$isAdmin): ?>
+                        <div style="background:#ffe0e0;color:#b30000;padding:10px;border-radius:5px;margin-bottom:15px;">
+                            ⚠ You have view-only access. Only admins can edit or delete suppliers.
+                        </div>
+                    <?php endif; ?>
 
-                <div class="suppliers">
+                    <div class="users">
 
                         <p class="userCount"><?= count($suppliers) ?> Suppliers</p>
 
-                        <table class="suppliers" id="suppliers_table">
+                        <table class="suppliers">
 
                             <thead>
                                 <tr>
@@ -121,27 +124,18 @@ $suppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <td class="supplierEmail"><?= $supplier['email'] ?></td>
 
                                         <td>
-
                                             <?php
-
                                             if (!empty($supplier['products'])) {
-
                                                 $products = explode(',', $supplier['products']);
-
                                                 echo "<ul>";
-
                                                 foreach ($products as $product) {
                                                     echo "<li>" . trim($product) . "</li>";
                                                 }
-
                                                 echo "</ul>";
                                             } else {
-
                                                 echo "-";
                                             }
-
                                             ?>
-
                                         </td>
 
                                         <td><?= $supplier['first_name'] . ' ' . $supplier['last_name'] ?></td>
@@ -150,26 +144,32 @@ $suppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                                         <td><?= date('M d,Y  @h:i:s A', strtotime($supplier['updated_at'])) ?></td>
 
+                                        <!-- ACTION -->
                                         <td class="actionCell">
 
-                                            <a href="#" class="action-btn editSupplier editBtn"
-                                                data-id="<?= $supplier['id'] ?>"
-                                                data-name="<?= $supplier['supplier_name'] ?>"
-                                                data-location="<?= $supplier['supplier_location'] ?>"
-                                                data-email="<?= $supplier['email'] ?>">
+                                            <?php if ($isAdmin): ?>
 
-                                                <i class="fa fa-pencil"></i> Edit
+                                                <a href="#" class="action-btn editSupplier editBtn"
+                                                    data-id="<?= $supplier['id'] ?>"
+                                                    data-name="<?= $supplier['supplier_name'] ?>"
+                                                    data-location="<?= $supplier['supplier_location'] ?>"
+                                                    data-email="<?= $supplier['email'] ?>">
 
-                                            </a>
+                                                    <i class="fa fa-pencil"></i> Edit
+                                                </a>
 
+                                                <a href="#" class="action-btn deleteSupplier deleteBtn"
+                                                    data-id="<?= $supplier['id'] ?>"
+                                                    data-name="<?= $supplier['supplier_name'] ?>">
 
-                                            <a href="#" class="action-btn deleteSupplier deleteBtn"
-                                                data-id="<?= $supplier['id'] ?>"
-                                                data-name="<?= $supplier['supplier_name'] ?>">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
 
-                                                <i class="fa fa-trash"></i> Delete
+                                            <?php else: ?>
 
-                                            </a>
+                                                <span style="color:#999;">🔒 Admin Only</span>
+
+                                            <?php endif; ?>
 
                                         </td>
 

@@ -6,6 +6,9 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
+// ✅ ADMIN CHECK
+$isAdmin = ($_SESSION['role'] ?? '') === 'admin';
+
 $_SESSION['table'] = 'products';
 $user = $_SESSION['user'];
 $_SESSION['redirect_to'] = 'order-create.php';
@@ -44,28 +47,42 @@ $_SESSION['redirect_to'] = 'order-create.php';
                         <i class="fa fa-plus"></i> Create Order
                     </h1>
 
+                    <!-- ⚠ WARNING -->
+                    <?php if (!$isAdmin): ?>
+                        <div style="background:#ffe0e0;color:#b30000;padding:10px;border-radius:5px;margin-bottom:15px;">
+                            ⚠ You do not have permission to create orders. Only admins can perform this action.
+                        </div>
+                    <?php endif; ?>
+
                     <form action="database/create-order.php" method="POST">
 
                         <div>
 
+                            <!-- ADD PRODUCT BUTTON -->
                             <div class="align-right">
-                                <button type="button" class="orderProductBtn">Add Another Product</button>
+                                <button type="button" class="orderProductBtn"
+                                    <?= !$isAdmin ? 'disabled style="opacity:0.6;cursor:not-allowed;"' : '' ?>>
+                                    <?= $isAdmin ? 'Add Another Product' : '🔒 Admin Only' ?>
+                                </button>
                             </div>
 
                             <div id="orderProductList">
 
                                 <div class="orderProductRow" id="productRowTemplate">
 
+                                    <!-- REMOVE BUTTON -->
                                     <div class="align-right">
-                                        <button type="button" class="removeProductRowBtn">
-                                            <i class="fa fa-trash"></i> Remove
+                                        <button type="button" class="removeProductRowBtn"
+                                            <?= !$isAdmin ? 'disabled style="opacity:0.6;cursor:not-allowed;"' : '' ?>>
+                                            <i class="fa fa-trash"></i> <?= $isAdmin ? 'Remove' : '🔒' ?>
                                         </button>
                                     </div>
 
                                     <div>
                                         <label>PRODUCT NAME</label>
 
-                                        <select name="product_id[]" class="product_name">
+                                        <select name="product_id[]" class="product_name"
+                                            <?= !$isAdmin ? 'disabled' : '' ?>>
 
                                             <option value="">Select Product</option>
 
@@ -94,8 +111,12 @@ $_SESSION['redirect_to'] = 'order-create.php';
 
                             </div>
 
+                            <!-- SUBMIT BUTTON -->
                             <div class="align-right">
-                                <button type="submit" class="orderProductSubmitBtn">Submit</button>
+                                <button type="submit" class="orderProductSubmitBtn"
+                                    <?= !$isAdmin ? 'disabled style="opacity:0.6;cursor:not-allowed;"' : '' ?>>
+                                    <?= $isAdmin ? 'Submit' : '🔒 Admin Only' ?>
+                                </button>
                             </div>
 
                         </div>
@@ -104,19 +125,17 @@ $_SESSION['redirect_to'] = 'order-create.php';
 
                 </div>
 
-
+                <!-- RESPONSE MESSAGE -->
                 <?php
                 if (isset($_SESSION['response'])) {
                     $response = $_SESSION['response'];
-                    ?>
-
+                ?>
                     <div class="responseMessage">
                         <p class="<?= $response['success'] ? 'successMessage' : 'errorMessage' ?>">
                             <?= $response['message'] ?>
                         </p>
                     </div>
-
-                    <?php
+                <?php
                     unset($_SESSION['response']);
                 }
                 ?>

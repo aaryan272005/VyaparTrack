@@ -1,3 +1,5 @@
+/* ================= UPDATE ORDER ================= */
+
 document.querySelectorAll(".updateOrderBtn").forEach((btn) => {
   btn.addEventListener("click", function () {
     let id = this.dataset.id;
@@ -59,23 +61,28 @@ document.querySelectorAll(".updateOrderBtn").forEach((btn) => {
 
         return fetch("database/update.php", {
           method: "POST",
-
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
-
-          body: `order_id=${id}&quantity_delivered=${qty}&status=${status}`,
+          body: `table=productsupplier&order_id=${id}&quantity_delivered=${qty}&status=${status}`,
         }).then((res) => res.json());
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire("Updated!", "Order updated successfully", "success");
+        console.log(result.value);
 
-        setTimeout(() => location.reload(), 1000);
+        if (result.value && result.value.success) {
+          Swal.fire("Updated!", "Order updated successfully", "success");
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          Swal.fire("Error", result.value?.message || "Update failed", "error");
+        }
       }
     });
   });
 });
+
+/* ================= VIEW DELIVERY HISTORY ================= */
 
 document.querySelectorAll(".viewDeliveryBtn").forEach((btn) => {
   btn.addEventListener("click", function () {
@@ -98,7 +105,6 @@ document.querySelectorAll(".viewDeliveryBtn").forEach((btn) => {
 
         Swal.fire({
           title: "Delivery Histories",
-
           html: `
 <table style="width:100%">
 <tr>
@@ -114,11 +120,12 @@ ${rows}
   });
 });
 
+/* ================= DELETE ORDER ================= */
+
 $(document).on("click", ".deleteOrderBtn", function (e) {
   e.preventDefault();
 
   let button = $(this);
-
   let orderId = button.data("id");
   let name = button.data("name");
 
@@ -139,27 +146,24 @@ $(document).on("click", ".deleteOrderBtn", function (e) {
         type: "POST",
         data: {
           id: orderId,
+          table: "productsupplier",
         },
+        dataType: "json",
+
         success: function (response) {
-          if (response.trim() === "success") {
+          console.log(response);
+
+          if (response.success) {
             Swal.fire("Deleted!", "Order has been deleted.", "success");
 
-            /* ROW ANIMATION */
             row.fadeOut(400, function () {
               $(this).remove();
 
-              /* UPDATE ORDER COUNT */
-              let rows = $(".users tbody tr");
-
-              $(".userCount").text(rows.length + " Orders");
-
-              /* FIX ROW NUMBERS */
-              rows.each(function (index) {
-                $(this)
-                  .find("td:first")
-                  .text(index + 1);
-              });
+              // ✅ FIXED: use your reusable function
+              reOrderTable(".orders", ".orderCount", "Orders");
             });
+          } else {
+            Swal.fire("Error", response.message, "error");
           }
         },
       });

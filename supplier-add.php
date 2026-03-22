@@ -6,8 +6,10 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
+// ✅ ADMIN CHECK
+$isAdmin = ($_SESSION['role'] ?? '') === 'admin';
+
 $_SESSION['table'] = 'supplier';
-$user = $_SESSION['user'];
 $_SESSION['redirect_to'] = 'supplier-add.php';
 ?>
 
@@ -47,25 +49,41 @@ $_SESSION['redirect_to'] = 'supplier-add.php';
                         <i class="fa fa-plus"></i> Create Supplier
                     </h1>
 
+                    <!-- ⚠ WARNING FOR NON-ADMIN -->
+                    <?php if (!$isAdmin): ?>
+                        <div style="background:#ffe0e0;color:#b30000;padding:10px;border-radius:5px;margin-bottom:15px;">
+                            ⚠ You do not have permission to perform this action. Only admins can create suppliers.
+                        </div>
+                    <?php endif; ?>
+
 
                     <div id="userAddFormContainer">
 
                         <form action="database/add.php" method="POST" class="userForm">
 
                             <label>Supplier Name:</label>
-                            <input type="text" placeholder="Enter supplier name..." name="supplier_name" required>
+                            <input type="text" placeholder="Enter supplier name..." name="supplier_name"
+                                <?= !$isAdmin ? 'disabled' : '' ?> required>
 
                             <label>Location:</label>
                             <input type="text" placeholder="Enter product supplier location..." name="supplier_location"
-                                required>
+                                <?= !$isAdmin ? 'disabled' : '' ?> required>
 
                             <label>Email:</label>
-                            <input type="email" placeholder="Enter supplier email..." name="email" required>
+                            <input type="email" placeholder="Enter supplier email..." name="email"
+                                <?= !$isAdmin ? 'disabled' : '' ?> required>
 
 
-                            <button class="userFormBtn">
-                                <i class="fa fa-plus"></i> Create Supplier
-                            </button>
+                            <!-- ✅ BUTTON CONTROL -->
+                            <?php if ($isAdmin): ?>
+                                <button type="submit" class="userFormBtn">
+                                    <i class="fa fa-plus"></i> Create Supplier
+                                </button>
+                            <?php else: ?>
+                                <button type="button" class="userFormBtn" style="background:#ccc;cursor:not-allowed;">
+                                    🔒 Admin Only
+                                </button>
+                            <?php endif; ?>
 
                         </form>
 
@@ -77,7 +95,7 @@ $_SESSION['redirect_to'] = 'supplier-add.php';
                     <?php
                     if (isset($_SESSION['response'])) {
                         $response = $_SESSION['response'];
-                        ?>
+                    ?>
 
                         <div class="responseMessage">
 
@@ -87,7 +105,7 @@ $_SESSION['redirect_to'] = 'supplier-add.php';
 
                         </div>
 
-                        <?php
+                    <?php
                         unset($_SESSION['response']);
                     }
                     ?>

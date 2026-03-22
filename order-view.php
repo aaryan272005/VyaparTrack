@@ -11,6 +11,9 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
+// ✅ ADMIN CHECK
+$isAdmin = ($_SESSION['role'] ?? '') === 'admin';
+
 include('database/connection.php');
 
 $query = "SELECT 
@@ -65,7 +68,6 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
 
     <div id="DashboardMainContainer">
 
-        <!-- SIDEBAR -->
         <?php include('partials/app-sidebar.php'); ?>
 
         <div class="DashboardContent_container">
@@ -79,6 +81,13 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
                     <h1 class="section_header">
                         <i class="fa fa-list"></i> List of Purchase Orders
                     </h1>
+
+                    <!-- ⚠ OPTIONAL WARNING -->
+                    <?php if (!$isAdmin): ?>
+                        <div style="background:#ffe0e0;color:#b30000;padding:10px;border-radius:5px;margin-bottom:15px;">
+                            ⚠ You have view-only access. Only admins can update or delete orders.
+                        </div>
+                    <?php endif; ?>
 
                     <div class="users">
 
@@ -124,33 +133,46 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
 
                                             <td><?= $order['first_name'] . ' ' . $order['last_name'] ?></td>
                                             <td><?= date('M d,Y  @h:i:s A', strtotime($order['created_at'])) ?></td>
+
                                             <td class="actionCell">
 
-                                                <button class="updateOrderBtn action-btn" data-id="<?= $order['id'] ?>"
-                                                    data-product="<?= $order['product_name'] ?>"
-                                                    data-ordered="<?= $order['quantity_order'] ?>"
-                                                    data-received="<?= $order['quantity_received'] ?>"
-                                                    data-supplier="<?= $order['supplier_name'] ?>"
-                                                    data-status="<?= $order['stats'] ?>">
+                                                <!-- ✅ UPDATE BUTTON -->
+                                                <?php if ($isAdmin): ?>
+                                                    <button class="updateOrderBtn action-btn"
+                                                        data-id="<?= $order['id'] ?>"
+                                                        data-product="<?= $order['product_name'] ?>"
+                                                        data-ordered="<?= $order['quantity_order'] ?>"
+                                                        data-received="<?= $order['quantity_received'] ?>"
+                                                        data-supplier="<?= $order['supplier_name'] ?>"
+                                                        data-status="<?= $order['stats'] ?>">
+                                                        <i class="fa fa-edit"></i> Update
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button class="action-btn" style="background:#ccc;cursor:not-allowed;">
+                                                        🔒 Update
+                                                    </button>
+                                                <?php endif; ?>
 
-                                                    <i class="fa fa-edit"></i> Update
 
-                                                </button>
-
-
-                                                <button class="viewDeliveryBtn action-btn" data-id="<?= $order['id'] ?>">
-
+                                                <!-- ✅ DELIVERY (ALWAYS AVAILABLE) -->
+                                                <button class="viewDeliveryBtn action-btn"
+                                                    data-id="<?= $order['id'] ?>">
                                                     <i class="fa fa-truck"></i> Deliveries
-
                                                 </button>
 
-                                                <button class="deleteOrderBtn action-btn deleteBtn"
-                                                    data-id="<?= $order['id'] ?>"
-                                                    data-name="<?= $order['product_name'] ?>">
 
-                                                    <i class="fa fa-trash"></i> Delete
-
-                                                </button>
+                                                <!-- ❌ DELETE BUTTON -->
+                                                <?php if ($isAdmin): ?>
+                                                    <button class="deleteOrderBtn action-btn deleteBtn"
+                                                        data-id="<?= $order['id'] ?>"
+                                                        data-name="<?= $order['product_name'] ?>">
+                                                        <i class="fa fa-trash"></i> Delete
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button class="action-btn" style="background:#ccc;cursor:not-allowed;">
+                                                        🔒 Delete
+                                                    </button>
+                                                <?php endif; ?>
 
                                             </td>
 
@@ -163,7 +185,6 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
                                     <tr>
                                         <td colspan="10" style="text-align:center">No Orders Found</td>
                                     </tr>
-
 
                                 <?php } ?>
 

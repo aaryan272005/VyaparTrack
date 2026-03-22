@@ -46,36 +46,37 @@ $(document).on("click", ".deleteUser", function (e) {
     text: "Are you sure you want to remove " + fullName + "?",
     icon: "warning",
     showCancelButton: true,
-    confirmButtonColor: "#008cff",
-    cancelButtonColor: "#6c757d",
-    confirmButtonText: "Yes, Delete",
-    reverseButtons: true,
   }).then((result) => {
     if (result.isConfirmed) {
       $.ajax({
         method: "POST",
         url: "database/delete.php",
-        data: { user_id: userId },
+
+        data: { 
+          id: userId, 
+          table: "users"   // ✅ FIXED
+        },
+
         dataType: "json",
 
         success: function (response) {
+          console.log(response); // DEBUG
+
           if (response.success) {
             button.closest("tr").fadeOut(300, function () {
               $(this).remove();
-              reOrderTable(".users", ".userCount", "Users"); // 🔥 fixes numbering
-            });
 
-            let count = $(".users tbody tr").length - 1;
-            $(".userCount").text(count + " Users");
+              reOrderTable(".users", ".userCount", "Users");
+            });
 
             Swal.fire({
               icon: "success",
               title: "Deleted!",
               text: fullName + " has been removed.",
-              confirmButtonColor: "#008cff",
               timer: 2000,
               showConfirmButton: false,
             });
+
           } else {
             Swal.fire("Error", response.message, "error");
           }
@@ -117,7 +118,7 @@ $(document).on("click", ".editUser", function (e) {
         method: "POST",
         url: "database/update.php",
         data: {
-          table: 'users',
+          table: "users",
           user_id: userId,
           first_name: result.value.first_name,
           last_name: result.value.last_name,
@@ -129,14 +130,14 @@ $(document).on("click", ".editUser", function (e) {
           if (response.success) {
             let row = button.closest("tr");
 
-            row.find(".fname").text(response.first_name);
-            row.find(".lname").text(response.last_name);
-            row.find(".email").text(response.email);
+            row.find(".fname").text(result.value.first_name);
+            row.find(".lname").text(result.value.last_name);
+            row.find(".email").text(result.value.email);
 
             // IMPORTANT: update data attributes
-            button.attr("data-fname", response.first_name);
-            button.attr("data-lname", response.last_name);
-            button.attr("data-email", response.email);
+            button.attr("data-fname", result.value.first_name);
+            button.attr("data-lname", result.value.last_name);
+            button.attr("data-email", result.value.email);
 
             Swal.fire({
               icon: "success",
@@ -259,17 +260,14 @@ $(document).on("click", ".editProduct", function (e) {
           if (response.success) {
             let row = button.closest("tr");
 
-            row.find(".productName").text(response.product_name);
-            row.find(".productDescription").text(response.description);
+            row.find(".product_name").text(response.product_name);
+            row.find(".description").text(response.description);
 
-            // 🔥 This updates the image instantly
             if (response.img) {
-              row.find(".productImages").attr("src", "uploads/" + response.img);
+              row
+                .find(".productImages")
+                .attr("src", "uploads/products/" + response.img);
             }
-
-            // IMPORTANT: update data attributes
-            button.attr("data-name", response.product_name);
-            button.attr("data-description", response.description);
 
             Swal.fire({
               icon: "success",
@@ -323,7 +321,7 @@ $(document).on("click", ".editSupplier", function (e) {
         method: "POST",
 
         data: {
-          table: 'supplier',
+          table: "supplier",
           supplier_id: supplierId,
           supplier_name: result.value.supplier_name,
           supplier_location: result.value.supplier_location,
@@ -336,14 +334,9 @@ $(document).on("click", ".editSupplier", function (e) {
           if (response.success) {
             let row = button.closest("tr");
 
-            row.find(".supplierName").text(response.supplier_name);
-            row.find(".supplierLocation").text(response.supplier_location);
-            row.find(".supplierEmail").text(response.email);
-
-            // IMPORTANT: update data attributes
-            button.attr("data-name", response.supplier_name);
-            button.attr("data-location", response.supplier_location);
-            button.attr("data-email", response.email);
+            row.find(".supplierName").text(result.value.supplier_name);
+            row.find(".supplierLocation").text(result.value.supplier_location);
+            row.find(".supplierEmail").text(result.value.email);
 
             Swal.fire({
               icon: "success",
@@ -383,16 +376,20 @@ $(document).on("click", ".deleteSupplier", function (e) {
         method: "POST",
         url: "database/delete.php",
 
-        data: { supplier_id: supplierId },
+        data: {
+          id: supplierId,
+          table: "supplier", // ✅ FIXED
+        },
 
         dataType: "json",
 
         success: function (response) {
+          console.log(response); // DEBUG
+
           if (response.success) {
             button.closest("tr").fadeOut(300, function () {
               $(this).remove();
 
-              // reorder table numbers + update count
               reOrderTable(".suppliers", ".supplierCount", "Suppliers");
             });
 
@@ -458,25 +455,4 @@ $(document).on("change", ".productSelect", function () {
 
 $(document).on("click", ".removeProduct", function () {
   $(this).closest(".orderRow").remove();
-});
-
-$("#searchInput.product-search").on("keyup", function() {
-    var value = $(this).val().toLowerCase();
-    $("#products_table tbody tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-    });
-});
-
-$("#searchInput.supplier-search").on("keyup", function() {
-    var value = $(this).val().toLowerCase();
-    $("#suppliers_table tbody tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-    });
-});
-
-$("#searchInput.user-search").on("keyup", function() {
-    var value = $(this).val().toLowerCase();
-    $("#users_table tbody tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-    });
 });

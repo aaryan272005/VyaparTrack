@@ -14,8 +14,14 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // ✅ ADMIN ONLY (SAFE)
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    echo json_encode(['success' => false, 'message' => 'Access Denied']);
+if (($_SESSION['role'] ?? '') !== 'admin') {
+    $_SESSION['response'] = [
+        'success' => false,
+        'message' => 'Access Denied - Admin Only'
+    ];
+
+    $redirect = $_SESSION['redirect_to'] ?? 'dashboard.php';
+    header("location: ../$redirect");
     exit();
 }
 
@@ -107,14 +113,7 @@ try {
             throw new Exception("Invalid supplier data");
         }
 
-        $stmt = $conn->prepare("
-            UPDATE supplier
-            SET supplier_name = :name,
-                supplier_location = :location,
-                email = :email,
-                updated_at = NOW()
-            WHERE id = :id
-        ");
+        $stmt = $conn->prepare("UPDATE supplier SET supplier_name = :name,supplier_location = :location,email = :email,updated_at = NOW() WHERE id = :id");
 
         $stmt->execute([
             ':name' => $name,
@@ -123,12 +122,7 @@ try {
             ':id' => $id
         ]);
 
-        echo json_encode([
-            'success' => true,
-            'supplier_name' => $name,
-            'supplier_location' => $location,
-            'email' => $email
-        ]);
+        echo json_encode(['success' => true]);
     }
 
 
@@ -152,12 +146,7 @@ try {
 
         $stmt->execute([$first_name, $last_name, $email, $id]);
 
-        echo json_encode([
-            'success' => true,
-            'first_name' => $first_name,
-            'last_name' => $last_name,
-            'email' => $email
-        ]);
+        echo json_encode(['success' => true]);
     }
 
 
@@ -185,32 +174,21 @@ try {
         $remaining = max(0, $order['quantity_order'] - $new_received);
 
         // Update order
-        $stmt = $conn->prepare("
-            UPDATE productsupplier 
-            SET quantity_received=?, quantity_remaining=?, stats=? 
-            WHERE id=?
-        ");
+        $stmt = $conn->prepare("UPDATE productsupplier SET quantity_received=?, quantity_remaining=?, stats=? WHERE id=?");
 
         $stmt->execute([$new_received, $remaining, $status, $order_id]);
 
         // Insert history + update stock
         if ($quantity_delivered > 0) {
 
-            $stmt = $conn->prepare("
-                INSERT INTO delivery_history (order_id, quantity_received, date_received) 
-                VALUES (?, ?, NOW())
-            ");
+            $stmt = $conn->prepare("INSERT INTO delivery_history (order_id, quantity_received, date_received) VALUES (?, ?, NOW())");
             $stmt->execute([$order_id, $quantity_delivered]);
 
             $stmt = $conn->prepare("SELECT product FROM productsupplier WHERE id=?");
             $stmt->execute([$order_id]);
             $product_id = $stmt->fetchColumn();
 
-            $stmt = $conn->prepare("
-                INSERT INTO stock (product_id, quantity)
-                VALUES (?, ?)
-                ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)
-            ");
+            $stmt = $conn->prepare(" INSERT INTO stock (product_id, quantity)  VALUES (?, ?)  ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)  ");
             $stmt->execute([$product_id, $quantity_delivered]);
         }
 

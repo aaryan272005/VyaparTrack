@@ -12,7 +12,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
     <div class="dashboardSidebar_User">
 
-        <img src="images/user/user2.png">
+        <img src="images/user/user1.png">
 
         <span>
             <?= $user['first_name'] . " " . $user['last_name'] ?>
@@ -30,7 +30,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
             <a href="dashboard.php">
 
-                <i class="fa fa-dashboard"></i>
+                <i class="fa-solid fa-dashboard"></i>
                 <span class="menuText">Dashboard</span>
 
             </a>
@@ -44,7 +44,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
             <a href="reports.php">
 
-                <i class="fa fa-chart-line"></i>
+                <i class="fa-solid fa-chart-line"></i>
                 <span class="menuText">Reports</span>
 
             </a>
@@ -57,9 +57,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <li class="liMenu has-submenu 
         <?= ($current_page == 'product-view.php' || $current_page == 'product-add.php') ? 'open active' : '' ?>">
 
-            <a href="#">
+            <a href="javascript:void(0)">
 
-                <i class="fa fa-tag"></i>
+                <i class="fa-solid fa-tag"></i>
                 <span class="menuText">Product</span>
                 <i class="fa fa-angle-down arrow"></i>
 
@@ -69,7 +69,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                 <li>
                     <a href="product-view.php"
-                       class="<?= ($current_page == 'product-view.php') ? 'active' : '' ?>">
+                        class="<?= ($current_page == 'product-view.php') ? 'active' : '' ?>">
 
                         <i class="fa-solid fa-circle"></i>
                         <span class="menuText">View Products</span>
@@ -79,7 +79,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                 <li>
                     <a href="product-add.php"
-                       class="<?= ($current_page == 'product-add.php') ? 'active' : '' ?>">
+                        class="<?= ($current_page == 'product-add.php') ? 'active' : '' ?>">
 
                         <i class="fa-solid fa-circle"></i>
                         <span class="menuText">Add Products</span>
@@ -97,9 +97,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <li class="liMenu has-submenu
         <?= ($current_page == 'supplier-view.php' || $current_page == 'supplier-add.php') ? 'open active' : '' ?>">
 
-            <a href="#">
+            <a href="javascript:void(0)">
 
-                <i class="fa fa-truck"></i>
+                <i class="fa-solid fa-truck"></i>
                 <span class="menuText">Supplier</span>
 
                 <i class="fa fa-angle-down arrow"></i>
@@ -110,7 +110,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                 <li>
                     <a href="supplier-view.php"
-                       class="<?= ($current_page == 'supplier-view.php') ? 'active' : '' ?>">
+                        class="<?= ($current_page == 'supplier-view.php') ? 'active' : '' ?>">
 
                         <i class="fa-solid fa-circle"></i>
                         <span class="menuText">View Supplier</span>
@@ -120,7 +120,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                 <li>
                     <a href="supplier-add.php"
-                       class="<?= ($current_page == 'supplier-add.php') ? 'active' : '' ?>">
+                        class="<?= ($current_page == 'supplier-add.php') ? 'active' : '' ?>">
 
                         <i class="fa-solid fa-circle"></i>
                         <span class="menuText">Add Supplier</span>
@@ -138,9 +138,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <li class="liMenu has-submenu
         <?= ($current_page == 'order-view.php' || $current_page == 'order-create.php') ? 'open active' : '' ?>">
 
-            <a href="#">
+            <a href="javascript:void(0)">
 
-                <i class="fa fa-cart-plus"></i>
+                <i class="fa-solid fa-cart-plus"></i>
                 <span class="menuText">Purchase Order</span>
 
                 <i class="fa fa-angle-down arrow"></i>
@@ -151,7 +151,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                 <li>
                     <a href="order-view.php"
-                       class="<?= ($current_page == 'order-view.php') ? 'active' : '' ?>">
+                        class="<?= ($current_page == 'order-view.php') ? 'active' : '' ?>">
 
                         <i class="fa-solid fa-circle"></i>
                         <span class="menuText">View Orders</span>
@@ -161,7 +161,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                 <li>
                     <a href="order-create.php"
-                       class="<?= ($current_page == 'order-create.php') ? 'active' : '' ?>">
+                        class="<?= ($current_page == 'order-create.php') ? 'active' : '' ?>">
 
                         <i class="fa-solid fa-circle"></i>
                         <span class="menuText">Create Order</span>
@@ -173,15 +173,23 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
         </li>
 
+        <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
+            <li class="<?= ($current_page == 'pos.php') ? 'active' : '' ?>">
+                <a href="pos.php">
+                    <i class="fa-solid fa-store"></i> POS
+                </a>
+            </li>
+        <?php endif; ?>
+
 
         <!-- USERS -->
 
         <li class="liMenu has-submenu
         <?= ($current_page == 'users-view.php' || $current_page == 'users-add.php') ? 'open active' : '' ?>">
 
-            <a href="#">
+            <a href="javascript:void(0)">
 
-                <i class="fa fa-user"></i>
+                <i class="fa-solid fa-user"></i>
                 <span class="menuText">User</span>
 
                 <i class="fa fa-angle-down arrow"></i>
@@ -192,7 +200,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                 <li>
                     <a href="users-view.php"
-                       class="<?= ($current_page == 'users-view.php') ? 'active' : '' ?>">
+                        class="<?= ($current_page == 'users-view.php') ? 'active' : '' ?>">
 
                         <i class="fa-solid fa-circle"></i>
                         <span class="menuText">View Users</span>
@@ -202,7 +210,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                 <li>
                     <a href="users-add.php"
-                       class="<?= ($current_page == 'users-add.php') ? 'active' : '' ?>">
+                        class="<?= ($current_page == 'users-add.php') ? 'active' : '' ?>">
 
                         <i class="fa-solid fa-circle"></i>
                         <span class="menuText">Add Users</span>

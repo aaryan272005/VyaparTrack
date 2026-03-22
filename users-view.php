@@ -13,8 +13,10 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
-$_SESSION['table'] = 'users';
+// ✅ ADMIN CHECK
+$isAdmin = ($_SESSION['role'] ?? '') === 'admin';
 
+$_SESSION['table'] = 'users';
 
 /* FETCH USERS */
 $users = include('database/show.php');
@@ -32,7 +34,6 @@ $users = include('database/show.php');
     <title>View Users ~VyaparTrack</title>
 
     <link rel="stylesheet" href="css/dashboard.css">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 </head>
@@ -50,7 +51,6 @@ $users = include('database/show.php');
             <!-- TOP NAV -->
             <?php include('partials/app-topNav.php'); ?>
 
-
             <div class="dashboardContent">
 
                 <div class="dashboard_content_main">
@@ -59,16 +59,18 @@ $users = include('database/show.php');
                         <i class="fa fa-list"></i> List of Users
                     </h1>
 
-
-                    <div class="search-container">
-                        <input type="text" id="searchInput" class="user-search" placeholder="Search for users...">
-                    </div>
+                    <!-- ⚠ WARNING -->
+                    <?php if (!$isAdmin): ?>
+                        <div style="background:#ffe0e0;color:#b30000;padding:10px;border-radius:5px;margin-bottom:15px;">
+                            ⚠ You have view-only access. Only admins can edit or delete users.
+                        </div>
+                    <?php endif; ?>
 
                     <div class="users">
 
                         <p class="userCount"><?= count($users) ?> Users</p>
 
-                        <table class="users" id="users_table">
+                        <table class="users">
 
                             <thead>
                                 <tr>
@@ -100,23 +102,33 @@ $users = include('database/show.php');
 
                                         <td><?= date('M d,Y  @h:i:s A', strtotime($user['updated_at'])) ?></td>
 
+                                        <!-- ACTION -->
                                         <td class="actionCell">
 
-                                            <a href="#" class="action-btn editUser editBtn" data-userid="<?= $user['id'] ?>"
-                                                data-fname="<?= $user['first_name'] ?>"
-                                                data-lname="<?= $user['last_name'] ?>" data-email="<?= $user['email'] ?>">
+                                            <?php if ($isAdmin): ?>
 
-                                                <i class="fa fa-pencil"></i> Edit
+                                                <a href="#" class="action-btn editUser editBtn"
+                                                    data-userid="<?= $user['id'] ?>"
+                                                    data-fname="<?= $user['first_name'] ?>"
+                                                    data-lname="<?= $user['last_name'] ?>"
+                                                    data-email="<?= $user['email'] ?>">
 
-                                            </a>
+                                                    <i class="fa fa-pencil"></i> Edit
+                                                </a>
 
-                                            <a href="#" class="action-btn deleteUser deleteBtn" data-userid="<?= $user['id'] ?>"
-                                                data-fname="<?= $user['first_name'] ?>"
-                                                data-lname="<?= $user['last_name'] ?>">
+                                                <a href="#" class="action-btn deleteUser deleteBtn"
+                                                    data-userid="<?= $user['id'] ?>"
+                                                    data-fname="<?= $user['first_name'] ?>"
+                                                    data-lname="<?= $user['last_name'] ?>">
 
-                                                <i class="fa fa-trash"></i> Delete
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
 
-                                            </a>
+                                            <?php else: ?>
+
+                                                <span style="color:#999;">🔒 Admin Only</span>
+
+                                            <?php endif; ?>
 
                                         </td>
 
@@ -137,7 +149,6 @@ $users = include('database/show.php');
         </div>
 
     </div>
-
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
