@@ -23,13 +23,9 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <title>POS</title>
 
-    <!-- ✅ FONT AWESOME -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <!-- MAIN CSS -->
     <link rel="stylesheet" href="css/dashboard.css">
 
-    <!-- SWEET ALERT -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
@@ -96,13 +92,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
-            transition: 0.2s;
-        }
-
-        .cartItem:hover {
-            background: #f2f2f2;
-            padding: 5px;
-            border-radius: 8px;
         }
 
         .qtyBtn {
@@ -116,7 +105,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .removeBtn {
             color: red;
             cursor: pointer;
-            margin-left: 5px;
         }
 
         .checkoutBtn {
@@ -135,7 +123,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background: #27ae60;
         }
 
-        /* Ripple */
         .ripple {
             position: absolute;
             width: 100px;
@@ -175,7 +162,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <div class="dashboardContent">
 
-                <h1><i class="fa-solid fa-cash-register"></i> POS Billing</h1>
+                <h1><i class="fa-solid fa-receipt"></i> POS Billing</h1>
 
                 <div class="posWrapper">
 
@@ -187,14 +174,16 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         ?>
 
                             <div class="productCard <?= $stock <= 0 ? 'out' : '' ?>"
-                                onclick="addToCart(event,<?= $p['id'] ?>,'<?= $p['product_name'] ?>',<?= $p['price'] ?>,<?= $stock ?>)">
+                                data-id="<?= $p['id'] ?>"
+                                data-stock="<?= $stock ?>"
+                                onclick="addToCart(event,<?= $p['id'] ?>,'<?= $p['product_name'] ?>',<?= $p['price'] ?>)">
 
                                 <img src="<?= !empty($p['img']) ? 'uploads/products/' . $p['img'] : 'images/default.png' ?>">
 
                                 <div class="productName"><?= $p['product_name'] ?></div>
                                 <div class="productPrice">₹<?= $p['price'] ?></div>
 
-                                <div style="margin-top:5px;font-size:13px;
+                                <div class="stockText" style="margin-top:5px;font-size:13px;
 color: <?= $stock == 0 ? 'red' : ($stock < 10 ? 'orange' : 'green') ?>;
 font-weight:600;">
 
@@ -215,7 +204,7 @@ font-weight:600;">
                     <!-- CART -->
                     <div class="cartBox">
 
-                        <h3><i class="fa-solid fa-receipt"></i> Cart</h3>
+                        <h3><i class="fa-solid fa-cart-shopping"></i> Cart</h3>
 
                         <div id="cartItems"></div>
 
@@ -239,28 +228,30 @@ font-weight:600;">
     <script>
         let cart = {};
 
-        function addToCart(e, id, name, price, stock) {
+        function addToCart(e, id, name, price) {
 
-            if (stock <= 0) {
+            let card = document.querySelector(`.productCard[data-id="${id}"]`);
+            let currentStock = parseInt(card.dataset.stock);
+
+            if (currentStock <= 0) {
                 Swal.fire("Out of Stock", "Product not available", "error");
                 return;
             }
 
-            if (cart[id] && cart[id].qty >= stock) {
+            if (cart[id] && cart[id].qty >= currentStock) {
                 Swal.fire("Stock Limit", "Max stock reached", "warning");
                 return;
             }
 
             let ripple = document.createElement("span");
             ripple.classList.add("ripple");
-            e.currentTarget.appendChild(ripple);
+            card.appendChild(ripple);
             setTimeout(() => ripple.remove(), 500);
 
             if (!cart[id]) cart[id] = {
                 name,
                 price,
-                qty: 1,
-                stock: stock
+                qty: 1
             };
             else cart[id].qty++;
 
@@ -269,11 +260,14 @@ font-weight:600;">
 
         function changeQty(id, d) {
 
+            let card = document.querySelector(`.productCard[data-id="${id}"]`);
+            let stock = parseInt(card.dataset.stock);
+
             let item = cart[id];
 
             if (!item) return;
 
-            if (item.qty + d > item.stock) {
+            if (item.qty + d > stock) {
                 Swal.fire("Stock Limit", "Cannot exceed stock", "warning");
                 return;
             }
@@ -306,7 +300,6 @@ font-weight:600;">
 <div>
 <b>${i.name}</b><br>
 ₹${i.price} × ${i.qty}
-<span style="font-size:12px;color:gray">(Stock: ${i.stock})</span>
 </div>
 <div>
 <button class="qtyBtn" onclick="changeQty(${id},-1)">-</button>
@@ -358,6 +351,7 @@ font-weight:600;">
                         })
                         .then(res => res.blob())
                         .then(blob => {
+
                             let url = URL.createObjectURL(blob);
                             let a = document.createElement('a');
                             a.href = url;
@@ -366,15 +360,41 @@ font-weight:600;">
 
                             Swal.fire("Success", "Invoice Downloaded", "success");
 
+                            /* 🔥 UPDATE STOCK LIVE */
+                            for (let id in cart) {
+
+                                let qtySold = cart[id].qty;
+
+                                let card = document.querySelector(`.productCard[data-id="${id}"]`);
+                                let stockText = card.querySelector(".stockText");
+
+                                let currentStock = parseInt(card.dataset.stock);
+                                let newStock = currentStock - qtySold;
+
+                                card.dataset.stock = newStock;
+
+                                if (newStock <= 0) {
+                                    stockText.innerText = "Out of Stock";
+                                    stockText.style.color = "red";
+                                    card.classList.add("out");
+                                } else if (newStock < 10) {
+                                    stockText.innerText = `Low Stock (${newStock})`;
+                                    stockText.style.color = "orange";
+                                } else {
+                                    stockText.innerText = `In Stock (${newStock})`;
+                                    stockText.style.color = "green";
+                                }
+                            }
+
                             cart = {};
                             renderCart();
+
                         });
                 }
             });
         }
     </script>
 
-    <!-- ✅ FIX: REQUIRED FOR SIDEBAR -->
     <script src="js/dashboard.js"></script>
 
 </body>

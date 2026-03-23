@@ -60,27 +60,36 @@ $_SESSION['redirect_to'] = 'product-add.php';
 
                             <!-- Product Name -->
                             <label>Product Name:</label>
-                            <input type="text" 
-                                   placeholder="Enter Product Name..." 
-                                   name="product_name" 
-                                   <?= !$isAdmin ? 'disabled' : '' ?> 
-                                   required>
+                            <input type="text"
+                                placeholder="Enter Product Name..."
+                                name="product_name"
+                                <?= !$isAdmin ? 'disabled' : '' ?>
+                                required>
 
                             <!-- Product Description -->
                             <label>Description:</label>
-                            <textarea class="productTextArea" 
-                                      placeholder="Enter Product Description..." 
-                                      name="description"
-                                      <?= !$isAdmin ? 'disabled' : '' ?> 
-                                      required></textarea>
+                            <textarea class="productTextArea"
+                                placeholder="Enter Product Description..."
+                                name="description"
+                                <?= !$isAdmin ? 'disabled' : '' ?>
+                                required></textarea>
+
+                            <!-- Product Price -->
+                            <label>Price (₹):</label>
+                            <input type="number"
+                                step="0.01"
+                                placeholder="Enter Product Price..."
+                                name="price"
+                                <?= !$isAdmin ? 'disabled' : '' ?>
+                                required>
 
                             <!-- Suppliers -->
                             <label>Suppliers:</label>
-                            <select name="suppliers[]" 
-                                    id="supplierInput" 
-                                    multiple 
-                                    <?= !$isAdmin ? 'disabled' : '' ?> 
-                                    required>
+                            <select name="suppliers[]"
+                                id="supplierInput"
+                                multiple
+                                <?= !$isAdmin ? 'disabled' : '' ?>
+                                required>
                                 <option value="">Select Supplier</option>
 
                                 <?php
@@ -102,12 +111,12 @@ $_SESSION['redirect_to'] = 'product-add.php';
                                 <label for="img" class="uploadBtn">
                                     <i class="fa fa-upload"></i> Upload Product Image
                                 </label>
-                                <input type="file" 
-                                       name="img" 
-                                       id="img" 
-                                       hidden 
-                                       <?= !$isAdmin ? 'disabled' : '' ?> 
-                                       required>
+                                <input type="file"
+                                    name="img"
+                                    id="img"
+                                    hidden
+                                    <?= !$isAdmin ? 'disabled' : '' ?>
+                                    required>
                                 <span id="fileName">No file selected</span>
                             </div>
 
@@ -117,10 +126,10 @@ $_SESSION['redirect_to'] = 'product-add.php';
                                     <i class="fa fa-plus"></i> Create Product
                                 </button>
                             <?php else: ?>
-                                <button type="button" 
-                                        class="userFormBtn" 
-                                        disabled 
-                                        style="opacity:0.6; cursor:not-allowed;">
+                                <button type="button"
+                                    class="userFormBtn"
+                                    disabled
+                                    style="opacity:0.6; cursor:not-allowed;">
                                     <i class="fa fa-lock"></i> Admin Only
                                 </button>
                             <?php endif; ?>
@@ -157,7 +166,7 @@ $_SESSION['redirect_to'] = 'product-add.php';
     <script>
         // Show file name after upload
         const fileInput = document.getElementById("img");
-        if(fileInput){
+        if (fileInput) {
             fileInput.addEventListener("change", function() {
                 const fileName = this.files[0]?.name || "No file selected";
                 document.getElementById("fileName").innerText = fileName;

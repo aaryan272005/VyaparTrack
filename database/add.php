@@ -40,6 +40,7 @@ if ($table_name == 'products') {
     $product_name = trim($_POST['product_name'] ?? '');
     $description  = trim($_POST['description'] ?? '');
     $suppliers    = $_POST['suppliers'] ?? [];
+    $price = $_POST['price'] ?? 0;
 
     if (empty($product_name) || empty($description)) {
         $_SESSION['response'] = [
@@ -82,16 +83,25 @@ if ($table_name == 'products') {
 
         $stmt = $conn->prepare("
             INSERT INTO products 
-            (product_name, description, img, created_by, created_at, updated_at) 
-            VALUES (?, ?, ?, ?, NOW(), NOW())
+            (product_name, description, price, img, created_by, created_at, updated_at) 
+            VALUES (?, ?, ?, ?, ?, NOW(), NOW())
         ");
 
         $stmt->execute([
             $product_name,
             $description,
+            $price,
             $image_name,
             $user_id
         ]);
+        if ($price <= 0) {
+            $_SESSION['response'] = [
+                'success' => false,
+                'message' => 'Price must be greater than 0'
+            ];
+            header("location: ../product-add.php");
+            exit();
+        }
 
         $product_id = $conn->lastInsertId();
 
@@ -111,7 +121,6 @@ if ($table_name == 'products') {
             'success' => true,
             'message' => 'Product created successfully'
         ];
-
     } catch (PDOException $e) {
 
         if ($conn->inTransaction()) {
@@ -162,7 +171,6 @@ if ($table_name == 'supplier') {
             'success' => true,
             'message' => 'Supplier created successfully'
         ];
-
     } catch (PDOException $e) {
 
         $_SESSION['response'] = [
@@ -212,7 +220,6 @@ if ($table_name == 'users') {
             'success' => true,
             'message' => 'User successfully added.'
         ];
-
     } catch (PDOException $e) {
 
         $_SESSION['response'] = [
